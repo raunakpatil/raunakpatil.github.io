@@ -267,29 +267,41 @@ nav.scrolled {
   flex-shrink: 0;
 }
 
-/* Character-split hero name */
+/* ── TYPOGRAPHY & SPACING FIX ──────────────────── */
 .hero-name {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: clamp(3.5rem, 9vw, 8rem);
   font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  line-height: 0.85; /* Tightened from 0.95 to close the gap */
+  letter-spacing: -0.05em;
   color: var(--text);
-  margin-bottom: 1.25rem;
-  overflow: hidden;
+  margin-bottom: 1rem;
 }
+.hero-name .line-wrap { display: block; }
+.hero-name .line2 { color: var(--accent); }
+
 .hero-name .char {
   display: inline-block;
+}
+
+/* ── TYPEWRITER CURSOR ─────────────────────────── */
+.typing-cursor {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.85em;
+  background-color: var(--accent);
+  vertical-align: baseline;
+  margin-left: 0.05em;
+  animation: blink 0.9s step-end infinite;
   opacity: 0;
-  transform: translateY(110%) rotateX(-40deg);
-  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
-.hero-name .char.visible {
-  opacity: 1;
-  transform: translateY(0) rotateX(0deg);
+.typing-cursor.active { opacity: 1; }
+.typing-cursor.hidden { display: none; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
-.hero-name .line-wrap { display: block; overflow: hidden; }
-.hero-name .line2 { color: var(--accent); }
 
 .hero-role {
   font-size: 1.05rem;
@@ -836,6 +848,90 @@ footer {
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; opacity: 0.4; }
+
+/* ── MOBILE RESPONSIVENESS ─────────────────────── */
+@media (max-width: 768px) {
+  /* 1. General Padding Adjustments */
+  section { padding: 5rem 1.5rem; }
+  .hero { padding: 6rem 1.5rem 3rem; }
+  .max-w { padding: 0; }
+  .divider { margin: 0 1.5rem; }
+
+  /* 2. Navigation Wrapping */
+  nav { 
+    padding: 1rem 1.5rem; 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 1rem; 
+  }
+  .nav-links { 
+    width: 100%; 
+    overflow-x: auto; 
+    gap: 1.25rem; 
+    padding-bottom: 0.25rem; 
+    -webkit-overflow-scrolling: touch; 
+  }
+  .nav-links::-webkit-scrollbar { display: none; } /* Hides the scrollbar for a clean swipe */
+
+  /* 3. Stack Grids into Single Columns */
+  .about-grid,
+  .projects-grid,
+  .edu-grid,
+  .contact-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .skills-grid, .metrics-grid {
+    grid-template-columns: 1fr; 
+  }
+
+  /* 4. Fix Hero Content */
+  .hero-stats { 
+    grid-template-columns: 1fr 1fr; /* 2 columns for stats on mobile */
+    gap: 1.5rem; 
+  }
+  .hero-cta { 
+    flex-direction: column; 
+    width: 100%; 
+  }
+  .hero-cta .btn { 
+    justify-content: center; 
+    width: 100%; 
+  }
+
+  /* 5. Adjust Experience Timeline for Mobile */
+  .exp-timeline-track, 
+  .exp-timeline-fill { 
+    display: none; /* Hide the vertical line on mobile */
+  }
+  .exp-item { 
+    grid-template-columns: 1fr; 
+    gap: 0.5rem; 
+    padding: 1.5rem 0; 
+  }
+  .exp-item::after { 
+    display: none; /* Hide the timeline dots */
+  }
+  .exp-date { padding-bottom: 0.5rem; }
+
+  /* 6. Form Padding */
+  .contact-form-card { padding: 1.5rem; }
+  
+  /* 7. Footer Stacking */
+  footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* ── DISABLE CUSTOM CURSOR ON TOUCHSCREENS ─────── */
+@media (hover: none) and (pointer: coarse) {
+  #cursor-dot, #cursor-ring { display: none !important; }
+  * { cursor: auto !important; }
+  .btn, a, .project-card, .contact-direct-item { cursor: pointer !important; }
+}
 </style>
 </head>
 <body>
@@ -1193,38 +1289,77 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startHeroAnimations() {
-  // Eyebrow
+  // 1. Eyebrow fades in instantly
   setTimeout(() => {
     document.getElementById('hero-eyebrow').classList.add('visible');
   }, 100);
 
-  // Character split for name
-  const names = [
-    { el: document.getElementById('line-raunak'), text: 'Raunak', class: '' },
-    { el: document.getElementById('line-patil'),  text: 'Patil',  class: 'line2' }
-  ];
-  names.forEach(({ el, text, class: cls }, lineIdx) => {
-    text.split('').forEach((ch, i) => {
+  // 2. Setup Typewriter Elements
+  const raunakEl = document.getElementById('line-raunak');
+  const patilEl = document.getElementById('line-patil');
+  const text1 = 'Raunak';
+  const text2 = 'Patil';
+  
+  raunakEl.innerHTML = '';
+  patilEl.innerHTML = '';
+
+  // Create blinking cursors
+  const cursor1 = document.createElement('span');
+  cursor1.className = 'typing-cursor';
+  raunakEl.appendChild(cursor1);
+
+  const cursor2 = document.createElement('span');
+  cursor2.className = 'typing-cursor hidden';
+  patilEl.appendChild(cursor2);
+
+  let delay = 400; // Initial pause before typing starts
+  const typeSpeed = 120; // Milliseconds per letter
+
+  // 3. Type "Raunak"
+  setTimeout(() => cursor1.classList.add('active'), 200);
+  text1.split('').forEach((ch) => {
+    setTimeout(() => {
       const span = document.createElement('span');
-      span.classList.add('char');
-      if (cls) span.classList.add(cls);
-      span.textContent = ch === ' ' ? '\u00a0' : ch;
-      el.appendChild(span);
-      setTimeout(() => span.classList.add('visible'), 300 + lineIdx * 200 + i * 60);
-    });
+      span.className = 'char';
+      span.textContent = ch;
+      raunakEl.insertBefore(span, cursor1);
+    }, delay);
+    delay += typeSpeed;
   });
 
-  // Role, stats, CTA, scroll hint
-  setTimeout(() => document.getElementById('hero-role').classList.add('visible'), 900);
+  // 4. Move cursor to next line
+  setTimeout(() => {
+    cursor1.classList.add('hidden');
+    cursor2.classList.remove('hidden');
+    cursor2.classList.add('active');
+  }, delay);
+  
+  delay += 300; // Pause between words like a real typist
+
+  // 5. Type "Patil"
+  text2.split('').forEach((ch) => {
+    setTimeout(() => {
+      const span = document.createElement('span');
+      span.className = 'char line2';
+      span.textContent = ch;
+      patilEl.insertBefore(span, cursor2);
+    }, delay);
+    delay += typeSpeed;
+  });
+
+  // 6. Reveal the rest of the content AFTER typing finishes
+  setTimeout(() => document.getElementById('hero-role').classList.add('visible'), delay + 200);
+  
   setTimeout(() => {
     const stats = document.getElementById('hero-stats');
     stats.classList.add('visible');
     animateCounters(stats.querySelectorAll('.stat-num'));
-  }, 1100);
-  setTimeout(() => document.getElementById('hero-cta').classList.add('visible'), 1300);
-  setTimeout(() => document.getElementById('scroll-hint').classList.add('visible'), 1600);
+  }, delay + 400);
+  
+  setTimeout(() => document.getElementById('hero-cta').classList.add('visible'), delay + 600);
+  setTimeout(() => document.getElementById('scroll-hint').classList.add('visible'), delay + 900);
 
-  // Nav reveal
+  // 7. Nav reveal stays independent
   setTimeout(() => {
     document.getElementById('nav-logo').classList.add('visible');
     document.querySelectorAll('#nav-links li').forEach((li, i) => {
