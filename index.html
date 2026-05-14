@@ -29,12 +29,40 @@ html { scroll-behavior: smooth; }
 * { cursor: none !important; }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(127,119,221,0.18), transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(93,202,165,0.12), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(240,153,123,0.10), transparent 32%),
+    linear-gradient(135deg, #05050a 0%, #0b0b13 45%, #11111b 100%);
+    
+  background-attachment: fixed;
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
-  font-size: 16px;
-  line-height: 1.7;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(127,119,221,0.10), transparent 25%),
+    radial-gradient(circle at 70% 60%, rgba(93,202,165,0.08), transparent 25%);
+    
+  filter: blur(80px);
+  animation: auroraMove 18s ease-in-out infinite alternate;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes auroraMove {
+  0% {
+    transform: translate3d(0,0,0) scale(1);
+  }
+  100% {
+    transform: translate3d(-5%, -3%, 0) scale(1.1);
+  }
 }
 
 /* ── NOISE OVERLAY ─────────────────────────────── */
@@ -180,50 +208,6 @@ nav.scrolled {
 .nav-links a.active { color: var(--text); }
 .nav-links a.active::after { transform: scaleX(1); }
 
-/* ── AMBIENT ORBS ───────────────────────────────── */
-.orb-container {
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0;
-  animation: orbFloat linear infinite;
-  transition: opacity 2s;
-}
-.orb.visible { opacity: 1; }
-.orb-1 {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(127,119,221,0.07) 0%, transparent 70%);
-  top: 10%; left: 5%;
-  animation-duration: 25s;
-}
-.orb-2 {
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(93,202,165,0.06) 0%, transparent 70%);
-  top: 50%; right: 5%;
-  animation-duration: 32s;
-  animation-delay: -10s;
-}
-.orb-3 {
-  width: 350px; height: 350px;
-  background: radial-gradient(circle, rgba(240,153,123,0.05) 0%, transparent 70%);
-  bottom: 10%; left: 30%;
-  animation-duration: 28s;
-  animation-delay: -5s;
-}
-@keyframes orbFloat {
-  0%   { transform: translate(0, 0) scale(1); }
-  25%  { transform: translate(30px, -40px) scale(1.05); }
-  50%  { transform: translate(-20px, -60px) scale(0.97); }
-  75%  { transform: translate(40px, -20px) scale(1.03); }
-  100% { transform: translate(0, 0) scale(1); }
-}
-
 /* ── HERO ───────────────────────────────────────── */
 .hero {
   min-height: 100vh;
@@ -233,23 +217,36 @@ nav.scrolled {
   position: relative;
   overflow: hidden;
 }
-.hero-grid {
-  position: absolute; inset: 0;
-  background-image: linear-gradient(var(--border) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 80px 80px;
-  mask-image: radial-gradient(ellipse 65% 65% at 50% 50%, black, transparent);
-  will-change: transform;
-}
-.hero-glow {
+
+#hero-video {
   position: absolute;
-  width: 800px; height: 800px;
-  background: radial-gradient(circle, rgba(127,119,221,0.1) 0%, transparent 65%);
-  top: 50%; left: 50%; transform: translate(-50%, -50%);
-  pointer-events: none;
-  will-change: transform;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.22;
+  filter:
+    brightness(0.38)
+    contrast(1.2)
+    saturate(0.75);
+
+  transform: scale(1.05);
 }
-.hero-content { position: relative; max-width: 960px; z-index: 1; }
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center,
+    rgba(8,8,13,0.05) 0%,
+    rgba(8,8,13,0.92) 85%);
+
+  z-index: 1;
+}
+
+.hero-content { position: relative; max-width: 960px; z-index: 2; }
 
 .hero-eyebrow {
   font-family: 'DM Mono', monospace;
@@ -349,6 +346,7 @@ nav.scrolled {
   color: var(--dim);
   opacity: 0; transform: translateY(8px);
   transition: opacity 0.7s ease 1.6s, transform 0.7s ease 1.6s;
+  z-index: 2;
 }
 .scroll-hint.visible { opacity: 1; transform: translateY(0); }
 .scroll-hint-line {
@@ -842,28 +840,17 @@ footer {
 </head>
 <body>
 
-<!-- CINEMATIC CURTAIN -->
 <div id="curtain">
   <div class="curtain-panel" id="curtain-top"></div>
   <div class="curtain-panel bottom" id="curtain-bot"></div>
 </div>
 <div id="curtain-logo">Raunak<span>.</span></div>
 
-<!-- CURSOR -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- SCROLL PROGRESS -->
 <div id="scroll-progress"></div>
 
-<!-- AMBIENT ORBS -->
-<div class="orb-container">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
-
-<!-- NAV -->
 <nav id="nav">
   <a href="#" class="nav-logo" id="nav-logo">Raunak<span>.</span>Patil</a>
   <ul class="nav-links" id="nav-links">
@@ -875,10 +862,12 @@ footer {
   </ul>
 </nav>
 
-<!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-grid" id="hero-grid"></div>
-  <div class="hero-glow" id="hero-glow"></div>
+
+  <video autoplay muted loop playsinline id="hero-video">
+    <source src="video.mp4" type="video/mp4">
+  </video>
+
   <div class="hero-content">
     <div class="hero-eyebrow" id="hero-eyebrow">AI Engineer · MSc Data Science & AI</div>
     <h1 class="hero-name" id="hero-name">
@@ -908,6 +897,7 @@ footer {
       <a href="https://www.linkedin.com/in/raunakpatil/" target="_blank" class="btn btn-outline magnetic">LinkedIn ↗</a>
     </div>
   </div>
+  
   <div class="scroll-hint" id="scroll-hint">
     <div class="scroll-hint-line"></div>
     Scroll to explore
@@ -916,7 +906,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- ABOUT -->
 <section id="about">
   <div class="max-w">
     <div class="section-label" data-num="01">About me</div>
@@ -951,7 +940,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- EXPERIENCE -->
 <section id="experience">
   <div class="max-w">
     <div class="section-label" data-num="02">Work</div>
@@ -990,7 +978,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- PROJECTS -->
 <section id="projects">
   <div class="max-w">
     <div class="section-label" data-num="03">Projects</div>
@@ -1035,7 +1022,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- SKILLS -->
 <section id="skills">
   <div class="max-w">
     <div class="section-label" data-num="04">Skills</div>
@@ -1080,7 +1066,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- EDUCATION -->
 <section id="education">
   <div class="max-w">
     <div class="section-label" data-num="05">Education & Certs</div>
@@ -1116,7 +1101,6 @@ footer {
 
 <div class="divider"></div>
 
-<!-- CONTACT -->
 <section id="contact">
   <div class="max-w">
     <div class="section-label" data-num="06">Contact</div>
@@ -1193,7 +1177,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('curtain').style.display = 'none';
     logo.style.display = 'none';
     startHeroAnimations();
-    document.querySelectorAll('.orb').forEach(o => o.classList.add('visible'));
   }, 2200);
 });
 
@@ -1268,13 +1251,6 @@ window.addEventListener('scroll', () => {
 
   // Nav background
   document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
-
-  // Parallax hero
-  const y = window.scrollY;
-  const grid = document.getElementById('hero-grid');
-  const glow = document.getElementById('hero-glow');
-  if (grid) grid.style.transform = `translateY(${y * 0.25}px)`;
-  if (glow) glow.style.transform = `translate(-50%, calc(-50% + ${y * 0.35}px))`;
 
   // Experience timeline fill
   animateExpTimeline();
