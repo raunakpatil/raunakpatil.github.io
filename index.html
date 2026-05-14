@@ -190,7 +190,8 @@
     letter-spacing: 0.03em;
     text-decoration: none;
     transition: all 0.2s;
-    cursor: none;
+    cursor: pointer;
+    pointer-events: auto;
   }
   .btn-primary {
     background: var(--accent);
@@ -539,6 +540,88 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* Contact Form */
+  .contact-form-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 3rem;
+    margin-top: -1.5rem;
+  }
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 3rem;
+    align-items: start;
+  }
+  .contact-form-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; font-weight: 500; }
+  .req { color: var(--accent); }
+  .form-input {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 0.65rem 0.9rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--dim); }
+  .form-textarea { resize: vertical; min-height: 120px; }
+  .form-error { font-size: 0.75rem; color: var(--accent3); display: none; }
+  .form-error.visible { display: block; }
+  .form-submit { align-self: flex-start; margin-top: 0.25rem; }
+  .form-hint { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--dim); margin-top: -0.5rem; }
+  .contact-direct { display: flex; flex-direction: column; gap: 1.5rem; padding-top: 0.5rem; }
+  .contact-direct-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .contact-direct-links { display: flex; flex-direction: column; gap: 0.75rem; }
+  .contact-direct-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .contact-direct-item:hover { border-color: var(--accent); background: var(--bg3); }
+  .cdi-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(127,119,221,0.1);
+    border: 1px solid rgba(127,119,221,0.2);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .cdi-label { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.1rem; }
+  .cdi-value { font-size: 0.85rem; color: var(--text); }
 </style>
 </head>
 <body>
@@ -547,7 +630,7 @@
 <div class="cursor-ring" id="cursorRing"></div>
 
 <nav>
-  <a href="#" class="nav-logo">R<span>.</span>Patil</a>
+  <a href="#" class="nav-logo">Raunak<span>.</span>Patil</a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#experience">Experience</a></li>
@@ -698,7 +781,7 @@
         </div>
         <span class="project-link">View on GitHub</span>
       </a>
-      <a class="project-card" href="https://titanic-survival-predictor-untighkxeujjcqbj7h79kn.streamlit.app/" target="_blank">
+      <a class="project-card" href="https://github.com/raunakpatil/titanic-survival-predictor" target="_blank">
         <div class="project-tag">ML · Explainability</div>
         <div class="project-name">Titanic Survival Predictor</div>
         <div class="project-desc">Interactive ML explainability dashboard — XGBoost + SHAP + Streamlit with survival prediction, passenger search, fairness audit, and model insights.</div>
@@ -709,7 +792,7 @@
           <span class="stack-pill">Streamlit</span>
           <span class="stack-pill">Plotly</span>
         </div>
-        <span class="project-link">Live Demo</span>
+        <span class="project-link">View on GitHub</span>
       </a>
     </div>
   </div>
@@ -810,17 +893,64 @@
 <!-- CONTACT -->
 <section id="contact">
   <div class="max-w">
-    <div class="contact-wrapper reveal">
-      <h2 class="contact-title">Let's build something<br><span>worth shipping.</span></h2>
-      <p class="contact-sub">Open to AI engineering roles, consulting, and interesting collaborations.</p>
-      <div class="contact-links">
-        <a href="mailto:raunakpatil15@gmail.com" class="btn btn-primary">raunakpatil15@gmail.com</a>
-        <a href="https://www.linkedin.com/in/raunakpatil/" target="_blank" class="btn btn-outline">LinkedIn ↗</a>
-        <a href="https://github.com/raunakpatil" target="_blank" class="btn btn-outline">GitHub ↗</a>
+    <div class="section-label" data-num="06">Contact</div>
+    <h2 class="section-title reveal">Let's Talk AI</h2>
+    <p class="contact-form-sub reveal">Open to enterprise AI consulting, collaboration, and new roles.</p>
+    <div class="contact-layout reveal">
+
+      <!-- FORM -->
+      <div class="contact-form-card">
+        <div class="form-group">
+          <label class="form-label">Your Name <span class="req">*</span></label>
+          <input type="text" id="cf-name" class="form-input" placeholder="Raunak Patil" />
+          <span class="form-error" id="err-name">Please enter your name.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="req">*</span></label>
+          <input type="email" id="cf-email" class="form-input" placeholder="you@example.com" />
+          <span class="form-error" id="err-email">Please enter your email address.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" id="cf-subject" class="form-input" placeholder="Project inquiry, collaboration…" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message <span class="req">*</span></label>
+          <textarea id="cf-message" class="form-input form-textarea" placeholder="Tell me what you're working on…"></textarea>
+          <span class="form-error" id="err-message">Please enter a message.</span>
+        </div>
+        <button class="btn btn-primary form-submit" onclick="handleContactForm()">Send Message</button>
+        <p class="form-hint">This opens your default email client with a pre-filled message.</p>
       </div>
-      <p style="margin-top: 3rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--dim); font-style: italic;">
-        "The best AI system is one that knows what it doesn't know."
-      </p>
+
+      <!-- DIRECT LINKS -->
+      <div class="contact-direct">
+        <div class="contact-direct-title">Or reach me directly</div>
+        <div class="contact-direct-links">
+          <a href="mailto:raunakpatil15@gmail.com" class="contact-direct-item">
+            <span class="cdi-icon">✉</span>
+            <div>
+              <div class="cdi-label">Email</div>
+              <div class="cdi-value">raunakpatil15@gmail.com</div>
+            </div>
+          </a>
+          <a href="https://github.com/raunakpatil" target="_blank" class="contact-direct-item">
+            <span class="cdi-icon">⌥</span>
+            <div>
+              <div class="cdi-label">GitHub</div>
+              <div class="cdi-value">github.com/raunakpatil</div>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/raunakpatil/" target="_blank" class="contact-direct-item">
+            <span class="cdi-icon">in</span>
+            <div>
+              <div class="cdi-label">LinkedIn</div>
+              <div class="cdi-value">linkedin.com/in/raunakpatil</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -843,6 +973,26 @@
     requestAnimationFrame(animateRing);
   }
   animateRing();
+
+  // Contact form
+  function handleContactForm() {
+    const name = document.getElementById('cf-name').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const subject = document.getElementById('cf-subject').value.trim();
+    const message = document.getElementById('cf-message').value.trim();
+    let valid = true;
+    document.getElementById('err-name').classList.toggle('visible', !name);
+    if (!name) valid = false;
+    const emailOk = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    document.getElementById('err-email').classList.toggle('visible', !emailOk);
+    if (!emailOk) valid = false;
+    document.getElementById('err-message').classList.toggle('visible', !message);
+    if (!message) valid = false;
+    if (!valid) return;
+    const sub = encodeURIComponent(subject || 'Hello Raunak');
+    const body = encodeURIComponent(`Hi Raunak,\n\n${message}\n\nBest,\n${name}\n${email}`);
+    window.location.href = `mailto:raunakpatil15@gmail.com?subject=${sub}&body=${body}`;
+  }
 
   // Scroll reveal
   const reveals = document.querySelectorAll('.reveal');
