@@ -967,7 +967,7 @@ footer {
   <div class="hero-content">
     <div class="hero-eyebrow" id="hero-eyebrow">AI Engineer · MSc Data Science & AI</div>
     <h1 class="hero-name" id="hero-name">
-      <span class="line-wrap" id="line-raunak"></span><br>
+      <span class="line-wrap" id="line-raunak"></span>
       <span class="line-wrap line2" id="line-patil"></span>
     </h1>
     <p class="hero-role" id="hero-role">
@@ -1336,7 +1336,7 @@ function startHeroAnimations() {
   
   delay += 300; // Pause between words like a real typist
 
-  // 5. Type "Patil"
+// 5. Type "Patil"
   text2.split('').forEach((ch) => {
     setTimeout(() => {
       const span = document.createElement('span');
@@ -1346,6 +1346,12 @@ function startHeroAnimations() {
     }, delay);
     delay += typeSpeed;
   });
+
+  // Hide the cursor completely after a brief pause
+  setTimeout(() => {
+    cursor2.classList.add('hidden');
+    cursor2.classList.remove('active');
+  }, delay + 400);
 
   // 6. Reveal the rest of the content AFTER typing finishes
   setTimeout(() => document.getElementById('hero-role').classList.add('visible'), delay + 200);
