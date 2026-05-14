@@ -33,34 +33,6 @@
     font-size: 16px;
     line-height: 1.7;
     overflow-x: hidden;
-    cursor: none;
-  }
-
-  /* Custom cursor */
-  .cursor {
-    position: fixed; top: 0; left: 0;
-    width: 10px; height: 10px;
-    background: var(--accent);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease, opacity 0.15s;
-    transform: translate(-50%, -50%);
-  }
-  .cursor-ring {
-    position: fixed; top: 0; left: 0;
-    width: 36px; height: 36px;
-    border: 1px solid rgba(127,119,221,0.4);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transition: transform 0.35s cubic-bezier(.25,.46,.45,.94), width 0.25s, height 0.25s, border-color 0.25s;
-    transform: translate(-50%, -50%);
-  }
-  body:has(a:hover) .cursor-ring,
-  body:has(button:hover) .cursor-ring {
-    width: 56px; height: 56px;
-    border-color: rgba(127,119,221,0.7);
   }
 
   /* Noise texture overlay */
@@ -626,9 +598,6 @@
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <nav>
   <a href="#" class="nav-logo">Raunak<span>.</span>Patil</a>
   <ul class="nav-links">
@@ -721,8 +690,8 @@
       <div class="exp-item">
         <div class="exp-date">Apr 2024<br>— Mar 2026<br><br>London, UK</div>
         <div>
-          <div class="exp-company">Data Strategy & Quality Analyst</div>
-          <div class="exp-role">Generative AI · RAG · RLHF · LLM Evaluation</div>
+          <div class="exp-company">Sigma AI</div>
+          <div class="exp-role">Data Strategy & Quality Analyst · Generative AI · RAG · RLHF · LLM Evaluation</div>
           <ul class="exp-bullets">
             <li>Audited RAG-based NLP and Generative AI systems, reducing hallucinations and improving dataset accuracy by <strong>18%</strong></li>
             <li>Served as Data Controller across <strong>14+ multilingual LLM training projects</strong>, ensuring 100% compliance with safety & alignment guidelines</li>
@@ -734,8 +703,8 @@
       <div class="exp-item">
         <div class="exp-date">Feb 2021<br>— Jan 2022<br><br>Bengaluru, India</div>
         <div>
-          <div class="exp-company">Junior Data Scientist</div>
-          <div class="exp-role">Machine Learning · Python · Predictive Modeling</div>
+          <div class="exp-company">Zummit Infolabs</div>
+          <div class="exp-role">Junior Data Scientist · Machine Learning · Python · Predictive Modeling</div>
           <ul class="exp-bullets">
             <li>Deployed Python ML models for predictive maintenance → <strong>15% reduction in downtime</strong></li>
             <li>Built customer segmentation models (K-Means, DBSCAN) → <strong>27% increase in conversion rates</strong></li>
@@ -961,19 +930,6 @@
 </footer>
 
 <script>
-  // Cursor
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`; });
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
   // Contact form
   function handleContactForm() {
     const name = document.getElementById('cf-name').value.trim();
