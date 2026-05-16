@@ -4,12 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Raunak Patil — AI Engineer</title>
-<link rel="icon" type="image/png" href="favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
+
 :root {
   --bg: #08080d;
   --bg2: #0f0f16;
@@ -567,6 +566,114 @@ footer {
   * { cursor: auto !important; }
   .btn, a, .project-card, .contact-direct-item { cursor: pointer !important; }
 }
+
+/* ── AI NEWS SECTION ──────────────────────────── */
+.news-header-row {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;
+}
+.news-filters {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.news-filter-btn {
+  font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); background: transparent; border: 1px solid var(--border2); border-radius: 4px;
+  padding: 0.35rem 0.8rem; cursor: none; transition: all 0.2s; pointer-events: auto;
+}
+.news-filter-btn:hover, .news-filter-btn.active {
+  color: var(--accent); border-color: var(--accent); background: rgba(127,119,221,0.07);
+}
+.news-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;
+}
+.news-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 1.4rem 1.6rem; display: flex; flex-direction: column; gap: 0.6rem;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(20px);
+  animation: newsCardIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes newsCardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+.news-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(127,119,221,0.07), transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.news-card:hover { border-color: var(--border2); background: var(--bg3); transform: translateY(-3px); }
+.news-card:hover::before { opacity: 1; }
+.news-card-source {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.news-source-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.news-source-name {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim);
+}
+.news-date {
+  font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--dim); margin-left: auto;
+}
+.news-card-title {
+  font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text);
+  line-height: 1.4; flex: 1;
+}
+.news-card-desc {
+  font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.news-card-footer {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 0.4rem;
+}
+.news-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.55rem; border-radius: 3px; border: 1px solid;
+}
+.news-read-more {
+  font-size: 0.72rem; color: var(--accent); letter-spacing: 0.05em; opacity: 0.7; transition: opacity 0.2s;
+}
+.news-card:hover .news-read-more { opacity: 1; }
+
+.news-skeleton-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;
+}
+.news-skeleton {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 1.4rem 1.6rem; display: flex; flex-direction: column; gap: 0.75rem;
+}
+.skel-line {
+  border-radius: 4px; background: linear-gradient(90deg, var(--bg3) 25%, #1e1e2e 50%, var(--bg3) 75%);
+  background-size: 200% 100%; animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skel-sm { height: 10px; width: 40%; }
+.skel-title { height: 16px; width: 90%; }
+.skel-title2 { height: 16px; width: 65%; }
+.skel-desc { height: 11px; width: 100%; }
+.skel-desc2 { height: 11px; width: 80%; }
+
+.news-empty {
+  grid-column: 1/-1; text-align: center; padding: 3rem;
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.05em;
+}
+.news-refresh-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem;
+  font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); background: transparent; border: 1px solid var(--border2); border-radius: 4px;
+  padding: 0.5rem 1rem; cursor: none; transition: all 0.2s; pointer-events: auto;
+}
+.news-refresh-btn:hover { border-color: var(--accent); background: rgba(127,119,221,0.07); }
+.news-last-updated {
+  font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--dim); text-align: right; margin-top: 1.5rem;
+}
+.spin { animation: spin360 0.9s linear infinite; display: inline-block; }
+@keyframes spin360 { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .news-grid, .news-skeleton-grid { grid-template-columns: 1fr; }
+  .news-header-row { flex-direction: column; align-items: flex-start; }
+}
 </style>
 </head>
 <body>
@@ -589,6 +696,7 @@ footer {
     <li><a href="#experience">Experience</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#skills">Skills</a></li>
+    <li><a href="#news">News</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -864,9 +972,41 @@ footer {
 
 <div class="divider"></div>
 
+<section id="news">
+  <div class="max-w">
+    <div class="section-label" data-num="06">Daily AI News</div>
+    <div class="news-header-row">
+      <h2 class="section-title" style="margin-bottom:0;">What's happening in AI.</h2>
+      <div class="news-filters" id="news-filters">
+        <button class="news-filter-btn active" data-filter="all">All</button>
+        <button class="news-filter-btn" data-filter="research">Research</button>
+        <button class="news-filter-btn" data-filter="industry">Industry</button>
+        <button class="news-filter-btn" data-filter="tools">Tools</button>
+      </div>
+    </div>
+
+    <!-- Skeletons shown while loading -->
+    <div class="news-skeleton-grid" id="news-skeletons">
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+      <div class="news-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-title"></div><div class="skel-line skel-title2"></div><div class="skel-line skel-desc"></div><div class="skel-line skel-desc2"></div></div>
+    </div>
+
+    <!-- News cards rendered here -->
+    <div class="news-grid" id="news-grid" style="display:none;"></div>
+
+    <div class="news-last-updated" id="news-last-updated"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section id="contact">
   <div class="max-w">
-    <div class="section-label" data-num="06">Contact</div>
+    <div class="section-label" data-num="07">Contact</div>
     <h2 class="section-title">Let's Talk AI.</h2>
     <p class="contact-form-sub reveal">Open to enterprise AI consulting, collaboration, and new roles.</p>
     <div class="contact-layout reveal">
@@ -1259,7 +1399,7 @@ document.querySelectorAll('.magnetic').forEach(btn => {
 });
 
 /* ─── ACTIVE NAV ──────────────────────────────── */
-const sections = ['home','about','experience','projects','skills','education','contact'];
+const sections = ['home','about','experience','projects','skills','education','news','contact'];
 function updateActiveNav() {
   let current = '';
   sections.forEach(id => {
@@ -1272,6 +1412,164 @@ function updateActiveNav() {
     a.classList.toggle('active', href === current);
   });
 }
+
+/* ─── AI NEWS FEED ────────────────────────────── */
+// Sources: Hacker News Algolia API + DEV.to API
+// Both are 100% free, no API key, no CORS issues — work from any static host
+
+const CATEGORY_KEYWORDS = {
+  research: ['paper','arxiv','research','study','model','benchmark','dataset','training','llm','transformer','diffusion','reinforcement','alignment','evaluation','findings','survey'],
+  tools:    ['tool','sdk','library','framework','open-source','open source','release','launch','plugin','extension','github','hugging face','huggingface','langchain','ollama','mistral','llama']
+};
+
+const SOURCE_META = {
+  hn:    { name: 'Hacker News', color: '#f0997b', tagText: '#f0997b', tagColor: 'rgba(240,153,123,0.12)', tagBorder: 'rgba(240,153,123,0.35)' },
+  devto: { name: 'DEV.to',      color: '#5dcaa5', tagText: '#5dcaa5', tagColor: 'rgba(93,202,165,0.12)',  tagBorder: 'rgba(93,202,165,0.35)'  }
+};
+
+const TAG_STYLES = {
+  Research: 'color:#7aa2f7;background:rgba(122,162,247,0.12);border-color:rgba(122,162,247,0.35);',
+  Tools:    'color:#bb9af7;background:rgba(187,154,247,0.12);border-color:rgba(187,154,247,0.35);',
+  Industry: 'color:#f0997b;background:rgba(240,153,123,0.12);border-color:rgba(240,153,123,0.35);'
+};
+
+let allNewsItems = [];
+let activeNewsFilter = 'all';
+
+function classifyItem(title, tags) {
+  const text = (title + ' ' + (tags || []).join(' ')).toLowerCase();
+  if (CATEGORY_KEYWORDS.research.some(w => text.includes(w))) return 'research';
+  if (CATEGORY_KEYWORDS.tools.some(w => text.includes(w))) return 'tools';
+  return 'industry';
+}
+
+function friendlyDate(str) {
+  try {
+    const diff = Math.floor((Date.now() - new Date(str)) / 1000);
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 172800) return 'Yesterday';
+    return new Date(str).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  } catch { return ''; }
+}
+
+function plain(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return (d.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+async function fetchHN() {
+  const since = Math.floor((Date.now() - 7 * 86400000) / 1000);
+  const searches = [
+    `https://hn.algolia.com/api/v1/search?query=AI+LLM&tags=story&hitsPerPage=10&numericFilters=created_at_i>${since},points>10`,
+    `https://hn.algolia.com/api/v1/search?query=machine+learning+artificial+intelligence&tags=story&hitsPerPage=8&numericFilters=created_at_i>${since},points>5`
+  ];
+  const seen = new Set();
+  const out = [];
+  for (const url of searches) {
+    try {
+      const data = await fetch(url).then(r => r.json());
+      for (const h of (data.hits || [])) {
+        if (!h.url || !h.title || seen.has(h.objectID)) continue;
+        seen.add(h.objectID);
+        out.push({ title: h.title, link: h.url, description: '', pubDate: h.created_at, category: classifyItem(h.title), _src: 'hn' });
+      }
+    } catch { /* silent fail */ }
+  }
+  return out;
+}
+
+async function fetchDevTo() {
+  const tags = ['artificial-intelligence', 'machinelearning', 'llm', 'deeplearning'];
+  const seen = new Set();
+  const out = [];
+  for (const tag of tags) {
+    try {
+      const articles = await fetch(`https://dev.to/api/articles?tag=${tag}&per_page=6&top=3`).then(r => r.json());
+      if (!Array.isArray(articles)) continue;
+      for (const a of articles) {
+        if (!a.url || !a.title || seen.has(a.id)) continue;
+        seen.add(a.id);
+        out.push({ title: a.title, link: a.url, description: a.description || '', pubDate: a.published_at, category: classifyItem(a.title, a.tag_list), _src: 'devto' });
+      }
+    } catch { /* silent fail */ }
+  }
+  return out;
+}
+
+function renderNewsCards(items) {
+  const grid = document.getElementById('news-grid');
+  const filtered = activeNewsFilter === 'all' ? items : items.filter(i => i.category === activeNewsFilter);
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="news-empty">No ${activeNewsFilter === 'all' ? '' : activeNewsFilter + ' '}articles right now.<br><button class="news-refresh-btn" onclick="loadNews()">↺ Retry</button></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.slice(0, 12).map((item, i) => {
+    const s = SOURCE_META[item._src];
+    const catLabel = item.category === 'research' ? 'Research' : item.category === 'tools' ? 'Tools' : 'Industry';
+    const desc = plain(item.description).slice(0, 130);
+    return `<a class="news-card" href="${item.link}" target="_blank" rel="noopener" style="animation-delay:${i*0.055}s;"
+      onmousemove="this.style.setProperty('--mx',(((event.clientX-this.getBoundingClientRect().left)/this.offsetWidth*100).toFixed(1)+'%'));this.style.setProperty('--my',(((event.clientY-this.getBoundingClientRect().top)/this.offsetHeight*100).toFixed(1)+'%'))">
+      <div class="news-card-source">
+        <span class="news-source-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}55;"></span>
+        <span class="news-source-name">${s.name}</span>
+        <span class="news-date">${friendlyDate(item.pubDate)}</span>
+      </div>
+      <div class="news-card-title">${item.title}</div>
+      ${desc ? `<div class="news-card-desc">${desc}…</div>` : ''}
+      <div class="news-card-footer">
+        <span class="news-tag" style="${TAG_STYLES[catLabel]}">${catLabel}</span>
+        <span class="news-read-more">Read →</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+async function loadNews() {
+  const skeletons = document.getElementById('news-skeletons');
+  const grid = document.getElementById('news-grid');
+  const ts = document.getElementById('news-last-updated');
+
+  skeletons.style.display = 'grid';
+  grid.style.display = 'none';
+  grid.innerHTML = '';
+
+  const [r1, r2] = await Promise.allSettled([fetchHN(), fetchDevTo()]);
+  const hn  = r1.status === 'fulfilled' ? r1.value : [];
+  const dev = r2.status === 'fulfilled' ? r2.value : [];
+
+  const seen = new Set();
+  const merged = [...hn, ...dev]
+    .filter(item => { const k = item.title.slice(0,50).toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  allNewsItems = merged;
+  skeletons.style.display = 'none';
+  grid.style.display = 'grid';
+
+  if (!merged.length) {
+    grid.innerHTML = `<div class="news-empty">Couldn't load news right now.<br><button class="news-refresh-btn" onclick="loadNews()">↺ Retry</button></div>`;
+  } else {
+    renderNewsCards(allNewsItems);
+    ts.textContent = 'Last updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+}
+
+document.getElementById('news-filters').addEventListener('click', e => {
+  const btn = e.target.closest('.news-filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.news-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeNewsFilter = btn.dataset.filter;
+  renderNewsCards(allNewsItems);
+});
+
+const newsObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { loadNews(); newsObserver.disconnect(); } });
+}, { threshold: 0.05 });
+const newsSection = document.getElementById('news');
+if (newsSection) newsObserver.observe(newsSection);
 
 /* ─── CONTACT FORM ────────────────────────────── */
 function handleContactForm() {
