@@ -10,6 +10,7 @@ export interface GithubRepo {
   stargazers_count: number
   language: string | null
   topics: string[]
+  homepage?: string
 }
 
 export async function fetchGithubData(username: string): Promise<GithubRepo[]> {

@@ -44,8 +44,8 @@ export function Project_Titanic({ repo, index }: { repo: GithubRepo, index: numb
 
   // Generate Flowing Paths
   const paths = useMemo(() => {
-    const inputs = []
-    const outputs = []
+    const inputs: { d: string, width: string, opacity: string }[] = []
+    const outputs: { d: string, width: string, opacity: string, color: string }[] = []
 
     // Map attributes to inputs
     attributes.forEach((attr, idx) => {
