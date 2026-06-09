@@ -54,7 +54,7 @@ export function Project_YoutubeAgent({ repo, index }: { repo: GithubRepo, index:
 
   // Generate dense flowing paths from nodes to center
   const leftPaths = useMemo(() => {
-    const paths = []
+    const paths: { d: string, color: string, opacity: string, width: string }[] = []
     nodes.forEach(node => {
       // 10 distinct paths per node to simulate high density data streams
       for(let i=0; i<15; i++) {
@@ -83,8 +83,8 @@ export function Project_YoutubeAgent({ repo, index }: { repo: GithubRepo, index:
 
   // Generate right side output paths and thumbnails
   const rightPaths = useMemo(() => {
-    const paths = []
-    const thumbs = []
+    const paths: { d: string, color: string, opacity: string }[] = []
+    const thumbs: { x: number, y: number, scale: number }[] = []
     for(let i=0; i<30; i++) {
       const startX = 570
       const startY = 250 + (Math.sin(i*41) * 30)
@@ -104,7 +104,7 @@ export function Project_YoutubeAgent({ repo, index }: { repo: GithubRepo, index:
       thumbs.push({
         x: endX - (Math.abs(Math.sin(i*59)) * 200) - 50,
         y: endY - (Math.abs(Math.cos(i*61)) * 50),
-        scale: (Math.abs(Math.sin(i*67)) * 0.5 + 0.5).toFixed(2)
+        scale: parseFloat((Math.abs(Math.sin(i*67)) * 0.5 + 0.5).toFixed(2))
       })
     }
     return { paths, thumbs }

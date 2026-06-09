@@ -35,7 +35,7 @@ export function SvgGrowth({ scrollYProgress }: { scrollYProgress: any }) {
     { x: 11, y: 27, r: 1, color: "#ffffff" },
   ]
 
-  const connections = []
+  const connections: { n1: { x: number, y: number, r: number, color: string }, n2: { x: number, y: number, r: number, color: string }, dist: number }[] = []
   nodes.forEach((n1, i) => {
     nodes.forEach((n2, j) => {
       if (i < j) {
@@ -93,17 +93,15 @@ export function SvgGrowth({ scrollYProgress }: { scrollYProgress: any }) {
           <motion.circle 
             cx={n.x} cy={n.y} r={n.r} 
             fill={n.color}
-            style={{ scale: nodeScale }}
+            style={{ scale: nodeScale, transformOrigin: `${n.x}px ${n.y}px` }}
             className="drop-shadow-[0_0_5px_rgba(0,240,255,0.8)]"
-            transformOrigin={`${n.x}px ${n.y}px`}
           />
           <motion.circle 
             cx={n.x} cy={n.y} r={n.r * 2} 
             fill="transparent"
             stroke={n.color}
             strokeWidth="0.2"
-            style={{ scale: pathLength, opacity: pathLength }}
-            transformOrigin={`${n.x}px ${n.y}px`}
+            style={{ scale: pathLength, opacity: pathLength, transformOrigin: `${n.x}px ${n.y}px` }}
           />
         </g>
       ))}

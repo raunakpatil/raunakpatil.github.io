@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing'
-import { PerformanceMonitor } from '@react-three/drei'
+import { PerformanceMonitor, PerspectiveCamera } from '@react-three/drei'
 import { useScroll } from 'framer-motion'
 import { Suspense, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -71,7 +71,7 @@ function SceneManager({ scrollYProgress, repos }: { scrollYProgress: any, repos:
       <LightManager scrollYProgress={scrollYProgress} />
 
       <group ref={cameraGroup}>
-        <perspectiveCamera makeDefault fov={75} position={[0, 0, 0]} />
+        <PerspectiveCamera makeDefault fov={75} position={[0, 0, 0]} />
       </group>
 
       <TheAwakening scrollYProgress={scrollYProgress} />
@@ -82,13 +82,17 @@ function SceneManager({ scrollYProgress, repos }: { scrollYProgress: any, repos:
         <TheGalaxy scrollYProgress={scrollYProgress} />
       </group>
 
-      <EffectComposer>
-        {/* Aggressive HDR Bloom that catches the fog and emissive materials */}
-        <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={2.5} />
-        {typeof window !== 'undefined' && window.innerWidth >= 768 && (
+      {typeof window !== 'undefined' && window.innerWidth >= 768 ? (
+        <EffectComposer>
+          {/* Aggressive HDR Bloom that catches the fog and emissive materials */}
+          <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={2.5} />
           <DepthOfField focusDistance={0.01} focalLength={0.05} bokehScale={2} height={480} />
-        )}
-      </EffectComposer>
+        </EffectComposer>
+      ) : (
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={2.5} />
+        </EffectComposer>
+      )}
     </>
   )
 }
