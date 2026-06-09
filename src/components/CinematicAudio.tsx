@@ -6,46 +6,42 @@ export function CinematicAudio() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
 
-  const [isScrolled, setIsScrolled] = useState(false)
 
-  // Wait for the first user interaction (scroll or click) to bypass autoplay restrictions
+  // Attempt to autoplay on mount and setup interaction listeners
   useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    // Attempt immediate autoplay for desktop
+    if (!isMuted) {
+      audio.play().catch((e) => {
+        console.warn("Immediate autoplay blocked by browser. Awaiting user interaction.", e)
+      })
+    }
+
     const handleInteraction = () => {
       if (!hasInteracted) {
         setHasInteracted(true)
-        if (audioRef.current && !isPlaying && !isMuted) {
-          // MUST call play() directly inside the user event handler call stack for iOS/Android Safari
-          audioRef.current.play()
-            .then(() => setIsPlaying(true))
-            .catch((e) => {
-              console.warn("Autoplay blocked on this interaction. Awaiting explicit user click.", e)
-            })
+        if (audio.paused && !isMuted) {
+          audio.play().catch((e) => {
+            console.warn("Autoplay blocked on this interaction.", e)
+          })
         }
       }
     }
 
-    const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.2) {
-        setIsScrolled(true)
-      } else {
-        setIsScrolled(false)
-      }
-      handleInteraction()
-    }
-
-    // Scroll is technically an interaction, but some browsers strictly require clicks or touches.
+    // Bind interaction events (click, touch, scroll)
     window.addEventListener('click', handleInteraction, { once: true })
     window.addEventListener('touchstart', handleInteraction, { once: true })
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleInteraction, { once: true })
 
     return () => {
       window.removeEventListener('click', handleInteraction)
       window.removeEventListener('touchstart', handleInteraction)
-      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', handleInteraction)
     }
-  }, [hasInteracted, isPlaying, isMuted])
+  }, [hasInteracted, isMuted])
 
   useEffect(() => {
     if (audioRef.current) {
@@ -54,8 +50,8 @@ export function CinematicAudio() {
   }, [isMuted])
 
   const toggleMute = () => {
-    if (!isPlaying && audioRef.current) {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error)
+    if (audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().catch(console.error)
     }
     setIsMuted(!isMuted)
   }
@@ -67,6 +63,7 @@ export function CinematicAudio() {
         src="/TRON Legacy (End Titles).mp3"
         loop
         preload="auto"
+        autoPlay
       />
 
       {/* Global Mute Toggle Button */}
