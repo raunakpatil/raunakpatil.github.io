@@ -1,3 +1,4 @@
+import { CinematicAudio } from '@/components/CinematicAudio'
 import { UniverseCanvas } from '@/components/webgl/UniverseCanvas'
 import { Act1_TheQuestion } from '@/components/acts/Act1_TheQuestion'
 import { Act2_TheBeginning } from '@/components/acts/Act2_TheBeginning'
@@ -25,6 +26,7 @@ export default async function Home() {
   return (
     <main className="relative w-full bg-transparent">
       <GlobalHeader />
+      <CinematicAudio />
       <UniverseCanvas repos={repos} />
       
       {/* The Cinematic Sequence (Overlay) */}
