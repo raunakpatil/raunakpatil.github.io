@@ -26,7 +26,7 @@ export function Act2_TheBeginning() {
         
         <motion.div className="will-change-transform" style={{ opacity: opacity1 }} className="absolute max-w-4xl text-center z-10 drop-shadow-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-8 md:p-12 rounded-3xl">
           <p className="text-2xl md:text-5xl font-light leading-relaxed">
-            Growing up in <strong className="font-bold text-[#bc13fe]">Nagpur</strong>, technology felt like magic. But magic is just engineering we don't understand yet. I wanted to understand.
+            Growing up, technology felt like magic. But magic is just engineering we don't understand yet. I wanted to understand.
           </p>
         </motion.div>
       </div>
