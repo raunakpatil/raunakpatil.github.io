@@ -42,7 +42,7 @@ export function Act8_TheFuture() {
         
         <div className="flex items-center justify-center gap-6 mt-12">
           <a 
-            href="mailto:contact@raunakpatil.com"
+            href="mailto:raunakpatil15@gmail.com"
             className="w-16 h-16 flex items-center justify-center bg-transparent text-white border border-white/20 rounded-full hover:bg-[#bc13fe]/10 hover:border-[#bc13fe] hover:text-[#bc13fe] hover:scale-110 hover:shadow-[0_0_20px_rgba(188,19,254,0.5)] transition-all duration-300"
             aria-label="Email Me"
           >
