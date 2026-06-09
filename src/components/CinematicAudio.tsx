@@ -20,21 +20,31 @@ export function CinematicAudio() {
       })
     }
 
+    let isAttempting = false
+
     const handleInteraction = () => {
-      if (!hasInteracted) {
-        setHasInteracted(true)
-        if (audio.paused && !isMuted) {
-          audio.play().catch((e) => {
-            console.warn("Autoplay blocked on this interaction.", e)
+      if (hasInteracted || isAttempting) return
+      
+      if (audio.paused && !isMuted) {
+        isAttempting = true
+        audio.play()
+          .then(() => {
+            setHasInteracted(true)
           })
-        }
+          .catch((e) => {
+            console.warn("Autoplay blocked on this interaction.", e)
+            isAttempting = false
+          })
+      } else {
+        setHasInteracted(true)
       }
     }
 
-    // Bind interaction events (click, touch, scroll)
-    window.addEventListener('click', handleInteraction, { once: true })
-    window.addEventListener('touchstart', handleInteraction, { once: true })
-    window.addEventListener('scroll', handleInteraction, { once: true })
+    if (!hasInteracted) {
+      window.addEventListener('click', handleInteraction)
+      window.addEventListener('touchstart', handleInteraction)
+      window.addEventListener('scroll', handleInteraction)
+    }
 
     return () => {
       window.removeEventListener('click', handleInteraction)
