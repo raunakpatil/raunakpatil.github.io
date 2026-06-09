@@ -85,7 +85,9 @@ function SceneManager({ scrollYProgress, repos }: { scrollYProgress: any, repos:
       <EffectComposer>
         {/* Aggressive HDR Bloom that catches the fog and emissive materials */}
         <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={2.5} />
-        <DepthOfField focusDistance={0.01} focalLength={0.05} bokehScale={2} height={480} />
+        {typeof window !== 'undefined' && window.innerWidth >= 768 && (
+          <DepthOfField focusDistance={0.01} focalLength={0.05} bokehScale={2} height={480} />
+        )}
       </EffectComposer>
     </>
   )
@@ -98,7 +100,7 @@ export function UniverseCanvas({ repos }: { repos: GithubRepo[] }) {
   return (
     // Replaced black backdrop with transparent to let R3F background color shine through
     <div className="fixed inset-0 z-[-1] bg-transparent">
-      <Canvas dpr={dpr} gl={{ antialias: false }}>
+      <Canvas dpr={dpr} gl={{ antialias: false }} frameloop="demand">
         <PerformanceMonitor onDecline={() => setDpr([1, 1])} />
         <Suspense fallback={null}>
           <SceneManager scrollYProgress={scrollYProgress} repos={repos} />

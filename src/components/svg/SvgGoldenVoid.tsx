@@ -30,7 +30,7 @@ export function SvgGoldenVoid({ scaleUniverse, scaleFg, scaleMg, scaleBg }: SvgG
     const mgText = []
     const bgText = []
 
-    for (let i = 0; i < 350; i++) {
+    for (let i = 0; i < 100; i++) {
       const angle = Math.random() * Math.PI * 2
       const radius = Math.random() * Math.random() * 100 
       const x = 50 + Math.cos(angle) * radius
@@ -39,14 +39,14 @@ export function SvgGoldenVoid({ scaleUniverse, scaleFg, scaleMg, scaleBg }: SvgG
       const text = concepts[Math.floor(Math.random() * concepts.length)]
       const delay = Math.random() * 5
 
-      if (i < 30) {
-        // Foreground: 30 items
+      if (i < 15) {
+        // Foreground: 15 items
         fgText.push({ x, y, text, delay, fontSize: Math.random() * 0.5 + 0.3, opacity: Math.random() * 0.2 + 0.8 })
-      } else if (i < 150) {
-        // Midground: 120 items
+      } else if (i < 50) {
+        // Midground: 35 items
         mgText.push({ x, y, text, delay, fontSize: Math.random() * 0.3 + 0.2, opacity: Math.random() * 0.3 + 0.4 })
       } else {
-        // Background: 200 items
+        // Background: 50 items
         bgText.push({ x, y, text, delay, fontSize: Math.random() * 0.15 + 0.1, opacity: Math.random() * 0.15 + 0.05 })
       }
     }

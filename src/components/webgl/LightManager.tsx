@@ -16,27 +16,28 @@ export function LightManager({ scrollYProgress }: { scrollYProgress: any }) {
 
   const ambientRef = useRef<THREE.AmbientLight>(null)
   const dirRef = useRef<THREE.DirectionalLight>(null)
+  const targetColorRef = useRef(new THREE.Color())
 
   useFrame(() => {
     const scroll = scrollYProgress.get()
 
     // --- FOG & BACKGROUND COLOR INTERPOLATION ---
-    let targetColor = cAwakening
+    const targetColor = targetColorRef.current
 
     if (scroll < 0.2) {
-      targetColor = cAwakening
+      targetColor.copy(cAwakening)
     } else if (scroll < 0.4) {
       const t = (scroll - 0.2) / 0.2
-      targetColor = new THREE.Color().lerpColors(cAwakening, cDiscovery, t)
+      targetColor.lerpColors(cAwakening, cDiscovery, t)
     } else if (scroll < 0.8) {
       const t = (scroll - 0.4) / 0.4
-      targetColor = new THREE.Color().lerpColors(cDiscovery, cBuilding, t)
+      targetColor.lerpColors(cDiscovery, cBuilding, t)
     } else if (scroll < 0.9) {
       const t = (scroll - 0.8) / 0.1
-      targetColor = new THREE.Color().lerpColors(cBuilding, cPhilosophy, t)
+      targetColor.lerpColors(cBuilding, cPhilosophy, t)
     } else {
       const t = (scroll - 0.9) / 0.1
-      targetColor = new THREE.Color().lerpColors(cPhilosophy, cFuture, t)
+      targetColor.lerpColors(cPhilosophy, cFuture, t)
     }
 
     if (scene.fog) {

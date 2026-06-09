@@ -24,12 +24,12 @@ export function Act4_Patterns() {
 
   return (
     <section ref={ref} className="relative min-h-[1000vh] bg-transparent text-white z-10 pointer-events-none">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap');
-      `}</style>
+      <style dangerouslySetInnerHTML={{__html: `
+        .font-grotesk { font-family: var(--font-space-grotesk), sans-serif; }
+      `}} />
 
       {/* Sticky Background & Title */}
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden w-full font-['Space_Grotesk']">
+      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden w-full font-grotesk">
         <div className="absolute inset-0 z-0">
           <SvgPatterns scrollYProgress={scrollYProgress} />
         </div>

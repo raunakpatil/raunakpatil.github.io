@@ -44,8 +44,9 @@ export function SvgAlignmentEngine({ scrollYProgress }: { scrollYProgress: Motio
     const generated: WordNode[] = []
     
     // Create columns for the aligned state
-    const cols = 8
-    const rows = 25
+    const isMobile = window.innerWidth < 768
+    const cols = isMobile ? 4 : 8
+    const rows = isMobile ? 20 : 25
     
     for (let i = 0; i < cols * rows; i++) {
       const col = i % cols
@@ -59,7 +60,7 @@ export function SvgAlignmentEngine({ scrollYProgress }: { scrollYProgress: Motio
       const iy = -50 + Math.random() * 200
       
       // Aligned grid positions
-      const tx = 15 + col * 10
+      const tx = (isMobile ? 35 : 15) + col * 10
       const ty = -10 + row * 5
       
       // Delay offset for the evaluation sweep

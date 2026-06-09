@@ -100,12 +100,9 @@ export function Act3_DiscoveringCode() {
 
   return (
     <section ref={ref} className="relative h-[400vh] bg-black text-[#00ff00] z-10 pointer-events-none">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        .terminal-text {
-          font-family: 'VT323', monospace;
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{__html: `
+        .terminal-text { font-family: var(--font-vt323), monospace; }
+      `}} />
       
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
         
