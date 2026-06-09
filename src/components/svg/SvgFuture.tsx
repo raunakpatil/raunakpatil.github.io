@@ -24,7 +24,7 @@ export function SvgFuture() {
         Using a massive square that overflows ensures no corners are ever seen.
       */}
       <motion.svg 
-        className="absolute w-[200vw] h-[200vw] md:w-[150vw] md:h-[150vw] opacity-80" 
+        className="absolute w-[200vmax] h-[200vmax] md:w-[150vmax] md:h-[150vmax] opacity-80" 
         viewBox="0 0 100 100" 
         preserveAspectRatio="xMidYMid slice"
         animate={{ rotate: 360 }}
