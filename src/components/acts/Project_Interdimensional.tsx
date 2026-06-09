@@ -82,20 +82,20 @@ export function Project_Interdimensional({ repo, index }: { repo: GithubRepo, in
           </div>
         </motion.div>
 
-        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-6" style={{ opacity: text2Opacity }}>
-          <h2 className="text-4xl md:text-6xl font-mono text-white tracking-widest uppercase italic drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-4" style={{ opacity: text2Opacity }}>
+          <h2 className="text-2xl sm:text-3xl md:text-6xl font-mono text-white tracking-wider md:tracking-widest uppercase italic drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] break-words w-full">
             Before recommendations...
           </h2>
         </motion.div>
 
-        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-6" style={{ opacity: text3Opacity }}>
-          <h2 className="text-4xl md:text-6xl font-mono text-white tracking-widest uppercase italic drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-4" style={{ opacity: text3Opacity }}>
+          <h2 className="text-2xl sm:text-3xl md:text-6xl font-mono text-white tracking-wider md:tracking-widest uppercase italic drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] break-words w-full">
             Before algorithms...
           </h2>
         </motion.div>
 
-        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-6" style={{ opacity: text4Opacity }}>
-          <h2 className="text-4xl md:text-7xl font-mono text-white font-bold tracking-widest uppercase drop-shadow-[0_0_30px_rgba(255,0,0,0.8)]">
+        <motion.div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none text-center px-4" style={{ opacity: text4Opacity }}>
+          <h2 className="text-2xl sm:text-3xl md:text-7xl font-mono text-white font-bold tracking-wider md:tracking-widest uppercase drop-shadow-[0_0_30px_rgba(255,0,0,0.8)] break-words w-full">
             Before endless scrolling...
           </h2>
         </motion.div>
@@ -115,11 +115,11 @@ export function Project_Interdimensional({ repo, index }: { repo: GithubRepo, in
 
         {/* --- THE LOCK TEXT --- */}
         <motion.div 
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none px-4"
           style={{ opacity: text5Opacity, scale: remoteScale }}
         >
           <motion.h2 
-            className="text-5xl md:text-7xl font-mono text-white font-bold tracking-widest uppercase drop-shadow-[0_0_30px_rgba(0,240,255,0.8)]"
+            className="text-4xl md:text-7xl font-mono text-white font-bold tracking-wider md:tracking-widest uppercase drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] text-center w-full"
           >
             There was discovery.
           </motion.h2>
