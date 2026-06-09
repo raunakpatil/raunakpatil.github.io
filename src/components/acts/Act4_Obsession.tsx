@@ -24,7 +24,7 @@ export function Act4_Obsession() {
 
 
         
-        <motion.div style={{ opacity: opacity1 }} className="absolute max-w-[95vw] md:max-w-6xl text-center z-10 p-6 md:p-12 drop-shadow-[0_0_15px_rgba(0,0,0,1)]">
+        <motion.div className="will-change-transform" style={{ opacity: opacity1 }} className="absolute max-w-[95vw] md:max-w-6xl text-center z-10 p-6 md:p-12 drop-shadow-[0_0_15px_rgba(0,0,0,1)]">
           <div className="leading-relaxed text-white flex flex-col items-center gap-2 md:gap-4 w-full">
             <span className="font-light tracking-wide text-base md:text-xl lg:text-2xl md:whitespace-nowrap">I didn't just want to write scripts. I wanted to build ecosystems. Moving to</span>
             <span className="font-bold text-4xl md:text-7xl text-white tracking-widest my-2 md:my-4" style={{ fontFamily: "'Baskerville', 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif" }}>Liverpool</span>

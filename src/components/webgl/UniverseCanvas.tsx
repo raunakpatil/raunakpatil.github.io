@@ -2,8 +2,9 @@
 
 import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing'
+import { PerformanceMonitor } from '@react-three/drei'
 import { useScroll } from 'framer-motion'
-import { Suspense, useRef } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 import { TheAwakening } from './scenes/TheAwakening'
@@ -92,11 +93,13 @@ function SceneManager({ scrollYProgress, repos }: { scrollYProgress: any, repos:
 
 export function UniverseCanvas({ repos }: { repos: GithubRepo[] }) {
   const { scrollYProgress } = useScroll()
+  const [dpr, setDpr] = useState<[number, number]>([1, 2])
 
   return (
     // Replaced black backdrop with transparent to let R3F background color shine through
     <div className="fixed inset-0 z-[-1] bg-transparent">
-      <Canvas dpr={[1, 2]} gl={{ antialias: false }}>
+      <Canvas dpr={dpr} gl={{ antialias: false }}>
+        <PerformanceMonitor onDecline={() => setDpr([1, 1])} />
         <Suspense fallback={null}>
           <SceneManager scrollYProgress={scrollYProgress} repos={repos} />
         </Suspense>

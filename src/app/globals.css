@@ -32,3 +32,10 @@ body::-webkit-scrollbar {
 .opacity-0 {
   opacity: 0;
 }
+
+/* Force hardware acceleration for Framer Motion elements */
+.will-change-transform {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
