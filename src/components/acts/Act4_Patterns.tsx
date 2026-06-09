@@ -34,7 +34,7 @@ export function Act4_Patterns() {
           <SvgPatterns scrollYProgress={scrollYProgress} />
         </div>
         
-        <div className="absolute top-12 font-mono text-gray-500 z-20 text-sm tracking-widest uppercase">Act IV — Patterns</div>
+
 
         {/* Phase 1: Chaos */}
         <motion.div style={{ opacity: op1 }} className="absolute w-full max-w-4xl text-center z-10 p-8">

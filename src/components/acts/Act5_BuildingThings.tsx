@@ -49,7 +49,7 @@ export function Act5_BuildingThings() {
     <section ref={containerRef} className="relative bg-transparent text-white z-10">
       
       <div className="py-32 px-6 text-center max-w-3xl mx-auto">
-        <div className="mono text-accent-secondary mb-4">Act V — Building Things</div>
+
         <h2 className="text-5xl md:text-7xl font-bold mb-6">From theory to production.</h2>
       </div>
 

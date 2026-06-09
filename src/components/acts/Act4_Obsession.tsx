@@ -22,7 +22,7 @@ export function Act4_Obsession() {
           <SvgBuilding scrollYProgress={scrollYProgress} />
         </div>
 
-        <div className="absolute top-12 mono text-gray-400">Act V — Building</div>
+
         
         <motion.div style={{ opacity: opacity1 }} className="absolute max-w-[95vw] md:max-w-6xl text-center z-10 p-6 md:p-12 drop-shadow-[0_0_15px_rgba(0,0,0,1)]">
           <div className="leading-relaxed text-white flex flex-col items-center gap-2 md:gap-4 w-full">

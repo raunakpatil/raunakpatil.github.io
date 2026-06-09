@@ -113,7 +113,7 @@ export function Act3_DiscoveringCode() {
           <TerminalBackground />
         </div>
 
-        <motion.div style={{ opacity: opacity1 }} className="absolute top-12 terminal-text text-green-500/50 text-xl tracking-widest z-10">ACT_III.exe — LEARNING</motion.div>
+
         
         <TerminalBox scrollYProgress={scrollYProgress} />
       </div>
