@@ -68,7 +68,7 @@ export function CinematicAudio() {
     <>
       <audio
         ref={audioRef}
-        src="/bg-audio.mp3"
+        src="/TRON Legacy (End Titles).mp3"
         loop
         preload="auto"
       />
