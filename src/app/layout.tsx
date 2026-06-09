@@ -27,7 +27,14 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Raunak Patil | AI Engineer",
-  description: "Award-winning interactive portfolio of Raunak Patil, AI Engineer.",
+  description: "Interactive portfolio of Raunak Patil, an AI Engineer passionate about building meaningful and intelligent systems.",
+  openGraph: {
+    title: "Raunak Patil | AI Engineer",
+    description: "Interactive portfolio of Raunak Patil, an AI Engineer passionate about building meaningful and intelligent systems.",
+    url: "https://raunakpatil.github.io",
+    siteName: "Raunak Patil Portfolio",
+    type: "website",
+  }
 };
 
 export default function RootLayout({
