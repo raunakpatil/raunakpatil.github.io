@@ -73,7 +73,7 @@ export function Act7_Philosophy() {
           style={{ scale: knownScale, opacity: knownOpacity }}
         >
           <h1 
-            className="text-white text-5xl md:text-8xl font-serif font-light tracking-[0.5em] text-center"
+            className="text-white text-4xl sm:text-5xl md:text-8xl font-serif font-light tracking-[0.2em] md:tracking-[0.5em] text-center whitespace-nowrap"
             style={{ textShadow: "0 0 40px rgba(255,215,0,0.8)" }}
           >
             K N O W N
