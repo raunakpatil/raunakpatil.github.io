@@ -12,6 +12,9 @@ export function Act1_TheQuestion() {
     offset: ["start start", "end end"]
   })
 
+  // Text 0: "THIS IS WHERE IT STARTED" (0 to 0.05)
+  const text0Opacity = useTransform(scrollYProgress, [0, 0.04], [1, 0])
+
   // Text 1: "Every engineer starts with a question" (0.4 to 0.5)
   const text1Opacity = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0, 1, 1, 0])
   const text1Y = useTransform(scrollYProgress, [0.4, 0.5], [30, 0])
@@ -33,6 +36,17 @@ export function Act1_TheQuestion() {
           <div className="absolute inset-0 z-0">
             <SvgCuriosity scrollYProgress={scrollYProgress} />
           </div>
+
+          {/* Scene 0 Text */}
+          <motion.div 
+            style={{ opacity: text0Opacity }} 
+            className="absolute text-center px-6 z-10"
+          >
+            <h1 className="text-sm md:text-base font-medium tracking-[0.3em] text-white/50 uppercase">
+              THIS IS WHERE IT STARTED <br/>
+              <span className="inline-block mt-8 text-2xl animate-bounce">↓</span>
+            </h1>
+          </motion.div>
 
           {/* Scene 4 Text */}
           <motion.div 

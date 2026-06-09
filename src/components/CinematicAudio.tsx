@@ -92,21 +92,7 @@ export function CinematicAudio() {
         </button>
       </div>
 
-      {/* Fallback Audio Initialization UI - Only visible if play failed after scroll */}
-      {hasInteracted && !isPlaying && !isMuted && !isScrolled && (
-        <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-1000 hidden md:block">
-          <button 
-            onClick={() => {
-              if (audioRef.current) {
-                audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error)
-              }
-            }}
-            className="px-6 py-3 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 text-sm tracking-widest uppercase transition-all"
-          >
-            Click anywhere to initialize vibe
-          </button>
-        </div>
-      )}
+
     </>
   )
 }
