@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { SvgFuture } from '../svg/SvgFuture'
+
 import { Mail } from 'lucide-react'
 
 import { LinkedinIcon, GithubIcon } from '../Icons'
@@ -17,7 +17,15 @@ export function Act8_TheFuture() {
         transition={{ duration: 4, ease: "easeOut" }}
         className="absolute inset-0 z-0 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)]"
       >
-        <SvgFuture />
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        >
+          <source src="/videos/videoplayback.webm" type="video/webm" />
+        </video>
       </motion.div>
 
       {/* Main Content Box */}
