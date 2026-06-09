@@ -12,8 +12,10 @@ export function Act1_TheQuestion() {
     offset: ["start start", "end end"]
   })
 
-  // Text 0: "THIS IS WHERE IT STARTED" (0 to 0.05)
-  const text0Opacity = useTransform(scrollYProgress, [0, 0.04], [1, 0])
+  // Text 0: "THIS IS WHERE IT STARTED" (0 to 0.03)
+  const text0Opacity = useTransform(scrollYProgress, [0, 0.03], [1, 0])
+  const text0Y = useTransform(scrollYProgress, [0, 0.03], [0, -50])
+  const text0Display = useTransform(scrollYProgress, (v) => v > 0.035 ? "none" : "block")
 
   // Text 1: "Every engineer starts with a question" (0.4 to 0.5)
   const text1Opacity = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0, 1, 1, 0])
@@ -39,7 +41,7 @@ export function Act1_TheQuestion() {
 
           {/* Scene 0 Text */}
           <motion.div 
-            style={{ opacity: text0Opacity }} 
+            style={{ opacity: text0Opacity, y: text0Y, display: text0Display }} 
             className="absolute text-center px-6 z-10"
           >
             <h1 className="text-sm md:text-base font-medium tracking-[0.3em] text-white/50 uppercase">
