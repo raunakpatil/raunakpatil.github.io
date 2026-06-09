@@ -15,14 +15,14 @@ export function Act8_TheFuture() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 4, ease: "easeOut" }}
-        className="absolute inset-0 z-0 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)]"
+        className="absolute inset-0 z-0"
       >
         <video 
           autoPlay 
           loop 
           muted 
           playsInline 
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          className="absolute bottom-0 w-full h-[70vh] md:h-full object-cover object-bottom md:object-center opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_20%,black_100%)]"
         >
           <source src="/videos/finalact.mp4" type="video/mp4" />
         </video>
