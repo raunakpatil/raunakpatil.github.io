@@ -62,7 +62,7 @@ export function Act7_Philosophy() {
           className="absolute inset-0 w-full h-full flex items-center justify-center origin-center"
           style={{ opacity: universeOpacity, rotate: universeRotate }}
         >
-          <div className="w-[150vmax] h-[150vmax] md:w-[100vmax] md:h-[100vmax] relative">
+          <div className="w-[150vmax] h-[150vmax] md:w-[100vmax] md:h-[100vmax] relative shrink-0">
             <SvgGoldenVoid scaleUniverse={universeScale} scaleFg={scaleFg} scaleMg={scaleMg} scaleBg={scaleBg} />
           </div>
         </motion.div>
