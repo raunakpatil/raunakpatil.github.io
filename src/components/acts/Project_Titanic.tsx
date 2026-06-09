@@ -3,6 +3,7 @@
 import { useRef, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { GithubRepo } from '@/lib/github'
+import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 
 export function Project_Titanic({ repo, index }: { repo: GithubRepo, index: number }) {
@@ -214,7 +215,16 @@ export function Project_Titanic({ repo, index }: { repo: GithubRepo, index: numb
             ))}
           </div>
 
-          <div className="mt-10 flex justify-center w-full">
+          <div className="mt-10 flex justify-center gap-4 w-full">
+            <a 
+              href="https://titanic-survival-predictor-raunak.streamlit.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3 bg-[#00f0ff] text-black font-bold rounded-full hover:bg-white transition-colors duration-300 flex items-center gap-2 text-sm pointer-events-auto"
+            >
+              <ExternalLink size={18} strokeWidth={2.5} />
+              Live Demo
+            </a>
             <a 
               href={repo.html_url}
               target="_blank"
