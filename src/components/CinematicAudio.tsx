@@ -15,6 +15,14 @@ export function CinematicAudio() {
     const handleInteraction = () => {
       if (!hasInteracted) {
         setHasInteracted(true)
+        if (audioRef.current && !isPlaying && !isMuted) {
+          // MUST call play() directly inside the user event handler call stack for iOS/Android Safari
+          audioRef.current.play()
+            .then(() => setIsPlaying(true))
+            .catch((e) => {
+              console.warn("Autoplay blocked on this interaction. Awaiting explicit user click.", e)
+            })
+        }
       }
     }
 
@@ -27,8 +35,7 @@ export function CinematicAudio() {
       handleInteraction()
     }
 
-    // Scroll is technically an interaction, but some browsers strictly require clicks.
-    // We will listen for any click, touch, or scroll event on the document.
+    // Scroll is technically an interaction, but some browsers strictly require clicks or touches.
     window.addEventListener('click', handleInteraction, { once: true })
     window.addEventListener('touchstart', handleInteraction, { once: true })
     window.addEventListener('scroll', handleScroll)
@@ -37,17 +44,6 @@ export function CinematicAudio() {
       window.removeEventListener('click', handleInteraction)
       window.removeEventListener('touchstart', handleInteraction)
       window.removeEventListener('scroll', handleScroll)
-    }
-  }, [hasInteracted])
-
-  useEffect(() => {
-    if (hasInteracted && audioRef.current && !isPlaying && !isMuted) {
-      audioRef.current.play()
-        .then(() => setIsPlaying(true))
-        .catch((e) => {
-          console.warn("Autoplay blocked. Awaiting explicit user click.", e)
-          // If scroll interaction wasn't enough, we wait for the fallback button.
-        })
     }
   }, [hasInteracted, isPlaying, isMuted])
 
