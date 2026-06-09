@@ -8,6 +8,8 @@ export function CinematicAudio() {
   const [isMuted, setIsMuted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
 
+  const [isScrolled, setIsScrolled] = useState(false)
+
   // Wait for the first user interaction (scroll or click) to bypass autoplay restrictions
   useEffect(() => {
     const handleInteraction = () => {
@@ -16,16 +18,25 @@ export function CinematicAudio() {
       }
     }
 
+    const handleScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.2) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+      handleInteraction()
+    }
+
     // Scroll is technically an interaction, but some browsers strictly require clicks.
     // We will listen for any click, touch, or scroll event on the document.
     window.addEventListener('click', handleInteraction, { once: true })
     window.addEventListener('touchstart', handleInteraction, { once: true })
-    window.addEventListener('scroll', handleInteraction, { once: true })
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
       window.removeEventListener('click', handleInteraction)
       window.removeEventListener('touchstart', handleInteraction)
-      window.removeEventListener('scroll', handleInteraction)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [hasInteracted])
 
@@ -86,8 +97,8 @@ export function CinematicAudio() {
       </div>
 
       {/* Fallback Audio Initialization UI - Only visible if play failed after scroll */}
-      {hasInteracted && !isPlaying && !isMuted && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-1000 hidden md:block">
+      {hasInteracted && !isPlaying && !isMuted && !isScrolled && (
+        <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-1000 hidden md:block">
           <button 
             onClick={() => {
               if (audioRef.current) {
