@@ -74,7 +74,7 @@ export function SvgCuriosity({ scrollYProgress }: { scrollYProgress: any }) {
 
       {/* The Question Mark (Moves UP to make room for text) */}
       <motion.svg 
-        className="w-[200px] h-[300px] overflow-visible z-10" 
+        className="w-[150px] h-[225px] md:w-[200px] md:h-[300px] overflow-visible z-10" 
         viewBox="0 0 200 300"
         style={{ opacity: sceneOpacity, y: svgY }}
       >

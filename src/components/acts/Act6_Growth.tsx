@@ -24,7 +24,7 @@ export function Act6_Growth() {
 
 
         
-        <motion.div className="will-change-transform" style={{ opacity: opacity1 }} className="absolute max-w-4xl text-center z-10 drop-shadow-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-8 md:p-12 rounded-3xl">
+        <motion.div style={{ opacity: opacity1 }} className="will-change-transform absolute max-w-4xl text-center z-10 drop-shadow-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-8 md:p-12 rounded-3xl">
           <p className="text-2xl md:text-5xl font-light leading-relaxed">
             Systems eventually <strong className="font-bold text-[#00f0ff]">connect.</strong> What started as isolated scripts evolved into full-stack infrastructure.
           </p>

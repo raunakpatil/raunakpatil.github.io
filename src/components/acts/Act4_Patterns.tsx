@@ -37,7 +37,7 @@ export function Act4_Patterns() {
 
 
         {/* Phase 1: Chaos */}
-        <motion.div className="will-change-transform" style={{ opacity: op1 }} className="absolute w-full max-w-4xl text-center z-10 p-8">
+        <motion.div style={{ opacity: op1 }} className="will-change-transform absolute w-full max-w-4xl text-center z-10 p-8">
           <div className="space-y-8 drop-shadow-[0_0_40px_rgba(0,0,0,1)]">
             <p className="text-gray-400 uppercase tracking-[0.4em] text-sm md:text-base font-bold">The code worked.</p>
             <p className="text-white font-black text-5xl md:text-[5rem] tracking-tighter leading-[1.1]">
@@ -47,7 +47,7 @@ export function Act4_Patterns() {
         </motion.div>
 
         {/* Phase 2: Mystery */}
-        <motion.div className="will-change-transform" style={{ opacity: op2 }} className="absolute w-full max-w-4xl text-center z-10 p-8">
+        <motion.div style={{ opacity: op2 }} className="will-change-transform absolute w-full max-w-4xl text-center z-10 p-8">
           <div className="space-y-8 drop-shadow-[0_0_40px_rgba(0,0,0,1)]">
             <p className="text-gray-400 uppercase tracking-[0.4em] text-sm md:text-base font-bold">What looked like noise...</p>
             <p className="text-white font-black text-5xl md:text-[5rem] tracking-tighter leading-[1.1]">
@@ -57,14 +57,14 @@ export function Act4_Patterns() {
         </motion.div>
 
         {/* Phase 3: Reveal */}
-        <motion.div className="will-change-transform" style={{ opacity: op3 }} className="absolute w-full max-w-4xl text-center z-10 p-8">
-          <h2 className="text-7xl md:text-[8rem] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00f0ff]/50 drop-shadow-[0_0_40px_rgba(0,255,255,0.4)]">
+        <motion.div style={{ opacity: op3 }} className="will-change-transform absolute w-full max-w-4xl text-center z-10 p-8">
+          <h2 className="text-5xl sm:text-7xl md:text-[8rem] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00f0ff]/50 drop-shadow-[0_0_40px_rgba(0,255,255,0.4)]">
             PATTERNS
           </h2>
         </motion.div>
 
         {/* Phase 4: Signals (Machine Network) */}
-        <motion.div className="will-change-transform" style={{ opacity: op4 }} className="absolute w-full h-full flex flex-col justify-center items-end pr-[10%] md:pr-[20%] z-10 pointer-events-none">
+        <motion.div style={{ opacity: op4 }} className="will-change-transform absolute w-full h-full flex flex-col justify-center items-end pr-[10%] md:pr-[20%] z-10 pointer-events-none">
           <div className="text-right drop-shadow-[0_0_40px_rgba(0,0,0,1)]">
             <p className="text-white font-black text-5xl md:text-[5rem] tracking-tighter leading-[1.1]">
               Behind every system<br/>were <span className="text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.6)]">signals.</span>
@@ -73,7 +73,7 @@ export function Act4_Patterns() {
         </motion.div>
 
         {/* Phase 5: People (Human Network) */}
-        <motion.div className="will-change-transform" style={{ opacity: op5 }} className="absolute w-full h-full flex flex-col justify-center items-start pl-[10%] md:pl-[20%] z-10 pointer-events-none">
+        <motion.div style={{ opacity: op5 }} className="will-change-transform absolute w-full h-full flex flex-col justify-center items-start pl-[10%] md:pl-[20%] z-10 pointer-events-none">
           <div className="text-left drop-shadow-[0_0_40px_rgba(0,0,0,1)]">
             <p className="text-white font-black text-5xl md:text-[5rem] tracking-tighter leading-[1.1]">
               Behind every signal<br/>were <span className="text-[#bc13fe] drop-shadow-[0_0_20px_rgba(188,19,254,0.6)]">people.</span>
@@ -82,7 +82,7 @@ export function Act4_Patterns() {
         </motion.div>
 
         {/* Phase 6: Convergence */}
-        <motion.div className="will-change-transform" style={{ opacity: op6 }} className="absolute w-full max-w-5xl text-center z-10 p-8 pointer-events-none">
+        <motion.div style={{ opacity: op6 }} className="will-change-transform absolute w-full max-w-5xl text-center z-10 p-8 pointer-events-none">
           <p className="text-white font-black text-5xl md:text-[5rem] tracking-tighter leading-[1.1] drop-shadow-[0_0_40px_rgba(0,0,0,1)]">
             The patterns had consequences.
           </p>
@@ -91,13 +91,13 @@ export function Act4_Patterns() {
         {/* Phase 7: Impact & Metrics */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           
-          <motion.div className="will-change-transform" style={{ opacity: zummitOp }} className="text-center z-20 transform -translate-y-16">
+          <motion.div style={{ opacity: zummitOp }} className="will-change-transform text-center z-20 transform -translate-y-16">
             <p className="text-gray-400 uppercase tracking-[0.4em] text-sm md:text-base font-bold mb-4 drop-shadow-[0_0_10px_rgba(0,0,0,1)]">my time at</p>
             <h3 className="text-5xl md:text-[6rem] lg:text-[7rem] font-black tracking-[0.1em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.6)] mix-blend-overlay">ZUMMIT INFOLAB</h3>
             <p className="text-[#bc13fe] tracking-[0.4em] text-sm md:text-lg uppercase mt-6 font-bold drop-shadow-[0_0_10px_rgba(0,0,0,1)]">Junior Data Scientist</p>
           </motion.div>
           
-          <motion.div className="will-change-transform" style={{ opacity: metricsOp }} className="absolute inset-0 w-full h-full z-10">
+          <motion.div style={{ opacity: metricsOp }} className="will-change-transform absolute inset-0 w-full h-full z-10">
             {/* SVG branches connecting core to metrics */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <line x1="50" y1="55" x2="25" y2="65" stroke="#00f0ff" strokeWidth="2" strokeDasharray="6 6" vectorEffect="non-scaling-stroke" className="opacity-40" />

@@ -77,9 +77,8 @@ export function Act5_ProjectsTransition() {
           
           {/* Subtle reflection/glitch effect */}
           <motion.h1 
-            style={{ letterSpacing: tracking, y: 10 }}
             className="absolute text-[10vw] md:text-[12vw] font-black leading-none text-transparent stroke-text opacity-20 blur-[2px] text-center"
-            style={{ WebkitTextStroke: "1px #00ffff" } as any}
+            style={{ letterSpacing: tracking, y: 10, WebkitTextStroke: "1px #00ffff" } as any}
           >
             PASSION<br/>PROJECTS
           </motion.h1>

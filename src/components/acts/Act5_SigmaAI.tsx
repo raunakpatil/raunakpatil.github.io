@@ -50,7 +50,7 @@ export function Act5_SigmaAI() {
         </div>
 
         {/* Phase 1 */}
-        <motion.div className="will-change-transform" style={{ opacity: op1 }} className="absolute z-10 text-center max-w-4xl px-4">
+        <motion.div style={{ opacity: op1 }} className="will-change-transform absolute z-10 text-center max-w-4xl px-4">
           <p className="text-2xl md:text-5xl font-light tracking-wide text-gray-300 drop-shadow-md">
             The scale of global systems wasn't theoretical anymore.
           </p>
@@ -87,15 +87,15 @@ export function Act5_SigmaAI() {
         </motion.div>
 
         {/* Pause Beat */}
-        <motion.div className="will-change-transform" style={{ opacity: op4_3 }} className="absolute z-10 text-center max-w-4xl px-4">
+        <motion.div style={{ opacity: op4_3 }} className="will-change-transform absolute z-10 text-center max-w-4xl px-4">
           <p className="text-2xl md:text-4xl font-light tracking-widest text-gray-400 drop-shadow-md uppercase">
             And alignment has consequences.
           </p>
         </motion.div>
 
         {/* Phase 5: Metrics */}
-        <motion.div className="will-change-transform" style={{ opacity: metric1Op }} className="absolute z-10 flex flex-col items-center justify-center text-center">
-          <p className="text-[6rem] md:text-[10rem] font-bold text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+        <motion.div style={{ opacity: metric1Op }} className="will-change-transform absolute z-10 flex flex-col items-center justify-center text-center">
+          <p className="text-7xl md:text-[10rem] font-bold text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
             +7%
           </p>
           <p className="text-xl md:text-3xl tracking-widest text-[#00f0ff] uppercase mt-4 font-mono">
@@ -103,8 +103,8 @@ export function Act5_SigmaAI() {
           </p>
         </motion.div>
 
-        <motion.div className="will-change-transform" style={{ opacity: metric2Op }} className="absolute z-10 flex flex-col items-center justify-center text-center">
-          <p className="text-[6rem] md:text-[10rem] font-bold text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+        <motion.div style={{ opacity: metric2Op }} className="will-change-transform absolute z-10 flex flex-col items-center justify-center text-center">
+          <p className="text-7xl md:text-[10rem] font-bold text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
             -12%
           </p>
           <p className="text-xl md:text-3xl tracking-widest text-[#bc13fe] uppercase mt-4 font-mono">
@@ -113,8 +113,8 @@ export function Act5_SigmaAI() {
         </motion.div>
 
         {/* Hero Metric */}
-        <motion.div className="will-change-transform" style={{ opacity: metric3Op }} className="absolute z-10 flex flex-col items-center justify-center text-center max-w-5xl px-4">
-          <p className="text-[8rem] md:text-[14rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00f0ff]/50 leading-none drop-shadow-[0_0_40px_rgba(0,240,255,0.6)]">
+        <motion.div style={{ opacity: metric3Op }} className="will-change-transform absolute z-10 flex flex-col items-center justify-center text-center max-w-5xl px-4">
+          <p className="text-[5rem] md:text-[14rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00f0ff]/50 leading-none drop-shadow-[0_0_40px_rgba(0,240,255,0.6)]">
             +30%
           </p>
           <p className="text-3xl md:text-5xl font-bold tracking-widest text-white uppercase mt-2 md:mt-4">
@@ -131,7 +131,7 @@ export function Act5_SigmaAI() {
         </motion.div>
 
         {/* Final Reveal */}
-        <motion.div className="will-change-transform" style={{ opacity: finalOp }} className="absolute z-10 flex flex-col items-center justify-center text-center">
+        <motion.div style={{ opacity: finalOp }} className="will-change-transform absolute z-10 flex flex-col items-center justify-center text-center">
           <p className="text-5xl md:text-8xl font-black tracking-tighter text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">
             SIGMA AI
           </p>
