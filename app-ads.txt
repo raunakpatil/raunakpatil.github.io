@@ -1,1 +1,0 @@
-# AdMob publisher id not set yet. Add ADMOB_PUBLISHER_ID to docs/site/site.config.json before launch.
