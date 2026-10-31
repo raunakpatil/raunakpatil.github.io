@@ -198,7 +198,10 @@
   /* ---------- detail modal ---------- */
   const modal = $('#detail');
   function openDetail(item, fly = false) {
-    $('#detail-media').innerHTML = item.mediaHTML || thumb(item.thumbAs || item);
+    // (a project with a film plays it here instead of its picture: video / videoPoster in data.js)
+    $('#detail-media').innerHTML = item.mediaHTML || (item.video
+      ? `<div class="thumb"><video src="${esc(item.video)}"${item.videoPoster ? ` poster="${esc(item.videoPoster)}"` : ''} playsinline controls preload="auto"></video></div>`
+      : thumb(item.thumbAs || item));
     $$('#detail-media img').forEach((im) => { im.loading = 'eager'; });
     $('#detail-meta').innerHTML = [item.category, item.year].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join('');
     $('#detail-title').textContent = item.title;
@@ -221,6 +224,9 @@
     modal.classList.remove('closing');
     modal.classList.toggle('fly', fly);
     modal.showModal();
+    // the film starts as the card opens, with its sound (the tap that opened it allows that); if the browser won't, muted
+    const film = $('#detail-media video');
+    if (film) film.play().catch(() => { film.muted = true; film.play().catch(() => {}); });
   }
   // closing fades the popup and its backdrop away (Esc too) instead of cutting to the page
   function closeDetail() {
@@ -230,6 +236,8 @@
     setTimeout(() => { modal.close(); modal.classList.remove('closing', 'fly'); }, 220);
   }
   $('.modal-close').addEventListener('click', closeDetail);
+  // (however it closes, a film in it stops)
+  modal.addEventListener('close', () => { $$('#detail-media video').forEach((v) => v.pause()); });
   $('#detail-demo').addEventListener('click', (e) => { if (e.currentTarget.getAttribute('href').startsWith('#')) closeDetail(); });
   modal.addEventListener('click', (e) => { if (e.target === modal) closeDetail(); });
   modal.addEventListener('cancel', (e) => { e.preventDefault(); closeDetail(); });
