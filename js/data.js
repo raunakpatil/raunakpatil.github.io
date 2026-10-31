@@ -250,7 +250,7 @@ window.PORTFOLIO = {
       ],
       goal: ['Builds AI people can trust', 'Finds signal in the noise', 'Ships tools that are free for everyone'],
       role: 'AI Quality Engineer · Open to work',
-      photo: 'https://avatars.githubusercontent.com/u/90265520?v=4&s=400',
+      photo: 'img/profile.webp',
       quote: 'The best AI system is one that knows what it doesn\'t know.',
       mindset: ['Learns best by building', 'Measures before guessing', 'Treats edge cases as the real test'],
     },
