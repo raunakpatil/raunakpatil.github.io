@@ -120,7 +120,7 @@ window.PORTFOLIO = {
       demo: '#assistant', demoText: 'Meet Ronie →',
     },
     {
-      title: 'Smart Glasses AI Agent', aka: ['Smart Glasses AI Agent', 'smart glasses'], category: 'AI Agents', year: 2026, image: 'img/projects/smart-glasses.webp', imageMobile: 'img/projects/smart-glasses-mobile.webp', tunnelImage: 'img/tunnel/smart-glasses.webp', tunnelImageMobile: 'img/tunnel/smart-glasses-mobile.webp', video: 'media/smart-glasses-film.mp4', videoPoster: 'img/projects/smart-glasses-film.webp',
+      title: 'Smart Glasses AI Agent', aka: ['Smart Glasses AI Agent', 'smart glasses'], category: 'AI Agents', year: 2026, image: 'img/projects/smart-glasses.webp', imageMobile: 'img/projects/smart-glasses-mobile.webp', tunnelImage: 'img/tunnel/smart-glasses.webp', tunnelImageMobile: 'img/tunnel/smart-glasses-mobile.webp', video: 'media/smart-glasses-film.mp4?v=2', videoPoster: 'img/projects/smart-glasses-film.webp?v=2',
       colors: ['#e879f9', '#111111'],
       tags: ['Python', 'FastAPI', 'Kotlin', 'Gemini Live', 'Meta Wearables SDK', 'Android TV'],
       description: 'An open-source, hands-free AI agent for Ray-Ban Meta glasses: say "Ronie" and just talk. It sees what you see, plays things on your TV and opens them on your laptop, reads a chess board, whispers answer points in interviews and remembers what matters, in Hindi, English or a mix of both. Works with Gemini, Claude, ChatGPT and DeepSeek, free to run.',
