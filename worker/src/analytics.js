@@ -271,7 +271,7 @@ async function affiliateList(env) {
       (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_open' AND json_extract(e.data, '$.key') = a.key) clicks,
       (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_open' AND json_extract(e.data, '$.key') = a.key AND e.ts >= ?) clicks30,
       (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_view' AND json_extract(e.data, '$.key') = a.key AND e.ts >= ?) views30
-    FROM affiliates a ORDER BY a.updated DESC`, month, month);
+    FROM affiliates a ORDER BY a.rowid`, month, month);   // (oldest first: the order of Radar's Top list)
   return { links };
 }
 // what Radar reads on every visit: { links: { key: { u, cta } } }, kept a minute in memory and five in browsers
@@ -281,7 +281,7 @@ export async function affiliatesPublic(env, cors, json) {
   if (!env.DB) return new Response('{"links":{}}', { headers: { ...headers, 'Content-Type': 'application/json' } });
   if (!affMemo || affMemo.until < Date.now()) {
     await schema(env);
-    const rows = await all(env, `SELECT key, url, cta FROM affiliates`);
+    const rows = await all(env, `SELECT key, url, cta FROM affiliates ORDER BY rowid`);   // (in the order they were added: Radar's Top list follows it)
     affMemo = { until: Date.now() + 6e4, body: JSON.stringify({ links: Object.fromEntries(rows.map((r) => [r.key, { u: r.url, cta: r.cta || null }])) }) };
   }
   return new Response(affMemo.body, { headers: { ...headers, 'Content-Type': 'application/json' } });
