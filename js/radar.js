@@ -539,6 +539,7 @@ function renderDirectory(T, catalogP) {
     const [front, rear] = c.querySelectorAll('.tool');
     if (over) {
       const t = byI.get(+c.dataset.i);
+      window.track?.('tool_view', t.n, null, { src: t.src, key: keyFor(t) });
       rear.innerHTML = back(t);
       const what = rear.querySelector('.tool-back-what');
       explainOf(t).then((x) => {
@@ -556,12 +557,14 @@ function renderDirectory(T, catalogP) {
   };
   grid.addEventListener('click', (e) => {
     const c = e.target.closest('.tool-card');
+    if (c && e.target.closest('.tool-go')) { const t = byI.get(+c.dataset.i); window.track?.('tool_open', t.n, null, { src: t.src, key: keyFor(t), href: t.u }); }
     if (!c || e.target.closest('.tool-go')) return;   // (↗ only opens the page)
     const sv = e.target.closest('.tool-save');
     if (sv) {   // (♥ saves it, or lets it go)
       const k = keyFor(byI.get(+c.dataset.i));
       if (saved.has(k)) saved.delete(k); else saved.add(k);
       keepSaved();
+      window.track?.('tool_save', byI.get(+c.dataset.i).n, saved.has(k) ? 1 : 0, { key: k });
       sv.setAttribute('aria-pressed', String(saved.has(k)));
       if (S.src === 'saved') draw();
       return;
@@ -630,7 +633,7 @@ function renderDirectory(T, catalogP) {
     more.hidden = items.length <= S.limit;
     more.textContent = `Show more · ${fmt(shownN)} of ${fmt(items.length)}`;
   });
-  const set = (k, v) => { S[k] = v; S.limit = 24; draw(); toURL(k !== 'q'); };
+  const set = (k, v) => { S[k] = v; S.limit = 24; draw(); toURL(k !== 'q'); if (k !== 'q') window.track?.('radar_filter', `${k}: ${v}`); };
   const reset = () => { Object.assign(S, { q: '', src: 'all', price: 'all', cat: 'all', limit: 24 }); search.value = ''; draw(); toURL(true); };
   // a view of the directory is a link: raunakpatil.com/radar?view=new&cat=video&price=free — and back steps back
   const PARAMS = { view: 'all', q: '', src: 'all', price: 'all', cat: 'all', sort: 'picks', ask: '' };
@@ -660,7 +663,12 @@ function renderDirectory(T, catalogP) {
   addEventListener('popstate', () => { if (onRadar()) { fromURL(); S.limit = 24; draw(); } });
   clear.addEventListener('click', reset);
   let qt = 0;
-  search.addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(() => set('q', search.value.trim().toLowerCase()), 140); });
+  let tq = 0;
+  search.addEventListener('input', () => {
+    clearTimeout(qt); qt = setTimeout(() => set('q', search.value.trim().toLowerCase()), 140);
+    // (for the command centre: what was searched, once they've stopped typing, and how many it found)
+    clearTimeout(tq); tq = setTimeout(() => { if (S.q.length > 1) window.track?.('radar_search', S.q, items.length, effQ !== S.q ? { fixed: effQ } : undefined); }, 1500);
+  });
   search.addEventListener('keydown', (e) => { if (e.key === 'Escape' && search.value) { e.stopPropagation(); search.value = ''; set('q', ''); } });
   // "/" jumps to the search, as on most sites with one
   document.addEventListener('keydown', (e) => {
@@ -838,6 +846,7 @@ function initAsk({ all, keyFor, icon, esc: e, cats, prices, loaded, show, hide, 
     const found = picks.map((p) => [byKey.get(p.key), p.why]).filter(([t]) => t);
     // (if the model can't be reached, the best word matches still help)
     const list = found.length ? found : pool.top.slice(0, 4).map((t) => [t, '']);
+    window.track?.('radar_ask', q, found.length, { picks: list.map(([t]) => t.n), failed: failed || undefined });
     const rest = pool.all.filter((t) => !list.some(([x]) => x === t));
     show(rest, q);
     const meta = (t) => `${e(cats[t.c] || '')}${prices[t.p] ? ` · ${prices[t.p]}` : ''}`;

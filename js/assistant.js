@@ -18,6 +18,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const MOTION = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 const GLYPHS = '!<>-_\\/[]{}=+*^?#$%&@ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
 const pick = (arr) => arr[(Math.random() * arr.length) | 0];
+// who's talking, for the command centre's transcripts (js/track.js keeps these ids)
+const visit = () => ({ vid: store.get('rp-vid') || '', sid: store.get('rp-sid') || '' });
 const store = {
   get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
@@ -2437,6 +2439,7 @@ function go(id, push = true) {
   if (step.skipIfName && answers.name) return go(step.skipIfName, push);
   clearTimeout(autoTimer);
   if (push) history.push(id);
+  window.track?.('ronie_step', id);
   showYou(null);
   setStatus('online');
   bar.style.width = `${(step.progress || 0) * 100}%`;
@@ -2520,7 +2523,7 @@ async function askRonie() {
   try {
     const r = await fetch(A.chatUrl, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: brain, messages: chatLog.slice(-8), name: answers.name || '' }), signal: ctl.signal,
+      body: JSON.stringify({ model: brain, messages: chatLog.slice(-8), name: answers.name || '', ...visit() }), signal: ctl.signal,
     });
     if (!r.ok) return (await r.json().catch(() => ({}))).error === 'quota' ? { quota: true } : null;
     const j = await r.json();
@@ -2728,6 +2731,7 @@ function showChat(id, step, offerEmail = false, links = []) {
       el.disabled = send.disabled = false;
       if (named) {
         answers.name = named; store.set('rai-name', named); chatLog.length = 0;
+        window.track?.('name', named);
         setFace('happy'); playGesture('nod');
         await typeLine(fill(pick(NAME_OK)));
         return showChat(id, step);
@@ -3397,7 +3401,7 @@ async function askGame() {
   try {
     const r = await fetch(A.chatUrl, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal,
-      body: JSON.stringify({ mode: 'game', model: brain, messages: game.log.slice(-60), asked: game.asked, name: answers.name || '' }),
+      body: JSON.stringify({ mode: 'game', model: brain, messages: game.log.slice(-60), asked: game.asked, name: answers.name || '', ...visit() }),
     });
     if (!r.ok) return (await r.json().catch(() => ({}))).error === 'quota' ? { quota: true } : null;
     const j = await r.json();
@@ -3417,6 +3421,7 @@ async function startGame() {
   const my = ++game.token;
   throwPhoto('toss');
   Object.assign(game, { log: [], asked: 0 });
+  window.track?.('game', 'start');
   clearTimeout(autoTimer);
   showYou(null);
   setStatus('mind reader', 'game');
@@ -3598,7 +3603,7 @@ function showActions(id, step) {
       if (!v && !inp.optional) { err.textContent = 'I need something here first.'; el.focus(); confused(); return; }
       if (inp.type === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { err.textContent = "That doesn't look like an email address."; el.focus(); confused(); return; }
       answers[inp.name] = v;
-      if (inp.name === 'name') store.set('rai-name', v);
+      if (inp.name === 'name') { store.set('rai-name', v); if (v) window.track?.('name', v); }
       react();
       go(step.next);
     };
@@ -3632,6 +3637,7 @@ function showActions(id, step) {
 
 // No server needed: open a message to him with everything filled in.
 function compose(kind) {
+  window.track?.('contact', kind, null, { name: answers.name || '', email: answers.email || '', company: answers.company || '', kind: answers.kind || '', message: String(answers.brief || answers.message || '').slice(0, 1200) });
   const lines = [];
   let subject;
   if (kind === 'hire') {

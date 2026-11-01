@@ -270,6 +270,7 @@ function page({ path, title, desc, body, ld = [], trail, prio = 0.6 }) {
       });
     })();
   </script>
+  <script src="/js/track.js${V ? `?v=${V}` : ''}" defer></script>
 </body>
 </html>
 `;

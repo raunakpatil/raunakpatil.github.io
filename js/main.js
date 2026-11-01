@@ -198,6 +198,8 @@
   /* ---------- detail modal ---------- */
   const modal = $('#detail');
   function openDetail(item, fly = false) {
+    // (for the command centre: which project, case study or certificate was opened, and from where)
+    window.track?.('open', item.title, null, { kind: /^Certificate/.test(item.category || '') ? 'certificate' : item.category === 'Case Study' ? 'case study' : 'project', category: item.category || '', from: fly ? 'tunnel' : undefined });
     // (a project with a film plays it here instead of its picture: video / videoPoster in data.js)
     $('#detail-media').innerHTML = item.mediaHTML || (item.video
       ? `<div class="thumb"><video src="${esc(item.video)}"${item.videoPoster ? ` poster="${esc(item.videoPoster)}"` : ''} playsinline controls preload="auto"></video></div>`
@@ -1751,7 +1753,7 @@
       if (!b) return;
       const i = +b.dataset.i;
       const c = C[i];
-      if (c.link && c.link !== '#') window.open(c.link, '_blank', 'noopener');
+      if (c.link && c.link !== '#') { window.track?.('open', c.title, null, { kind: 'case study', link: c.link }); window.open(c.link, '_blank', 'noopener'); }
       else openDetail({ ...c, category: 'Case Study', mediaHTML: `<div class="modal-cover" style="--spine:${esc(c.spine)}">${coverHTML(c, i, true)}</div>` });
     });
   }

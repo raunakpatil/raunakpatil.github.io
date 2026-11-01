@@ -23,3 +23,12 @@ id = "08e09fa0db2a4372bf3974b7042f3667"
 
 [triggers]
 crons = ["*/30 * * * *"]
+
+# the command centre's analytics (src/analytics.js, read by hq.html). One-time setup (README → "Command centre"):
+#   npx wrangler d1 create ronie-analytics      → paste the database_id it prints below, then uncomment these lines
+#   npx wrangler secret put ADMIN_TOKEN          → the passphrase hq.html asks for
+# Until then the site's beacon is simply ignored (the worker answers 204 and keeps nothing).
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "ronie-analytics"
+# database_id = "PASTE-THE-ID-HERE"
