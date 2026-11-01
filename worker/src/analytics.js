@@ -22,6 +22,8 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS se_vid ON sessions (vid)`,
   `CREATE INDEX IF NOT EXISTS ch_ts ON chats (ts)`,
   `CREATE INDEX IF NOT EXISTS ch_vid ON chats (vid, ts)`,
+  // Radar's affiliate links, set in HQ: a tool (by its Radar key, e.g. "pick:Runway") and where its links go instead
+  `CREATE TABLE IF NOT EXISTS affiliates (key TEXT PRIMARY KEY, name TEXT, url TEXT NOT NULL, cta TEXT, updated INTEGER)`,
 ];
 // (the tables make themselves the first time they're needed, once per worker instance: no migration step)
 let ready = null;
@@ -146,6 +148,23 @@ export async function admin(request, env, ctx, cors, json, tools) {
     if (request.method === 'GET' && path === 'visitor') return json(await visitor(env, url.searchParams.get('vid') || ''), 200, cors);
     if (request.method === 'GET' && path === 'live') return json(await live(env), 200, cors);
     if (request.method === 'POST' && path === 'insights') return json(await insights(env, url, tools), 200, cors);
+    if (request.method === 'GET' && path === 'affiliates') return json(await affiliateList(env), 200, cors);
+    if (request.method === 'POST' && path === 'affiliates') {
+      const b = await request.json();
+      const key = str(b.key, 200), url = str(b.url, 1000);
+      if (!key || !/^(pick|gh|hf|ph):./.test(key)) return json({ error: 'pick a tool from the list' }, 400, cors);
+      try { if (!/^https?:$/.test(new URL(url).protocol)) throw 0; } catch { return json({ error: 'the link must start with https://' }, 400, cors); }
+      await env.DB.prepare(`INSERT INTO affiliates (key, name, url, cta, updated) VALUES (?1, ?2, ?3, ?4, ?5)
+        ON CONFLICT(key) DO UPDATE SET name = ?2, url = ?3, cta = ?4, updated = ?5`).bind(key, str(b.name, 120), url, str(b.cta, 40), Date.now()).run();
+      affMemo = null;
+      return json(await affiliateList(env), 200, cors);
+    }
+    if (request.method === 'POST' && path === 'affiliates/delete') {
+      const b = await request.json();
+      await env.DB.prepare(`DELETE FROM affiliates WHERE key = ?`).bind(str(b.key, 200)).run();
+      affMemo = null;
+      return json(await affiliateList(env), 200, cors);
+    }
     if (request.method === 'POST' && path === 'note') {
       const b = await request.json();
       if (!ID.test(b.vid || '')) return json({ error: 'bad request' }, 400, cors);
@@ -242,6 +261,30 @@ async function stats(env, url) {
     radar: { searches, zero, asks, toolViews, toolOpens, toolSaves, filters, news, models },
     opens, people, chats, sessions, live: liveNow, steps, scrolls,
   };
+}
+
+// ---------- affiliate links ----------
+// the list for HQ, each with how often its link was followed (Radar's ↗, its card's button, or an Ask Radar answer)
+async function affiliateList(env) {
+  const month = Date.now() - 30 * 864e5;
+  const links = await all(env, `SELECT a.key, a.name, a.url, a.cta, a.updated,
+      (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_open' AND json_extract(e.data, '$.key') = a.key) clicks,
+      (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_open' AND json_extract(e.data, '$.key') = a.key AND e.ts >= ?) clicks30,
+      (SELECT COUNT(*) FROM events e WHERE e.type = 'tool_view' AND json_extract(e.data, '$.key') = a.key AND e.ts >= ?) views30
+    FROM affiliates a ORDER BY a.updated DESC`, month, month);
+  return { links };
+}
+// what Radar reads on every visit: { links: { key: { u, cta } } }, kept a minute in memory and five in browsers
+let affMemo = null;
+export async function affiliatesPublic(env, cors, json) {
+  const headers = { ...cors, 'Cache-Control': 'public, max-age=300' };
+  if (!env.DB) return new Response('{"links":{}}', { headers: { ...headers, 'Content-Type': 'application/json' } });
+  if (!affMemo || affMemo.until < Date.now()) {
+    await schema(env);
+    const rows = await all(env, `SELECT key, url, cta FROM affiliates`);
+    affMemo = { until: Date.now() + 6e4, body: JSON.stringify({ links: Object.fromEntries(rows.map((r) => [r.key, { u: r.url, cta: r.cta || null }])) }) };
+  }
+  return new Response(affMemo.body, { headers: { ...headers, 'Content-Type': 'application/json' } });
 }
 
 async function live(env) {

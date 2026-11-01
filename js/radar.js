@@ -458,6 +458,9 @@ function renderDirectory(T, catalogP) {
   };
   const keyFor = (t) => (t.src === 'pick' ? `pick:${t.n}` : t.src === 'gh' ? `gh:${t.u.replace('https://github.com/', '')}`
     : t.src === 'hf' ? `hf:${t.u.replace('https://huggingface.co/spaces/', '')}` : `ph:${t.slug}`);
+  // where a tool's links go: Raunak's affiliate link when he has one for it, else its own page
+  const affOf = (t) => { const a = AFF[keyFor(t)]; return a && /^https?:\/\//.test(a.u) ? a : null; };
+  const linkOf = (t) => (affOf(t) ? affOf(t).u : t.u);
   const EX = new Map();
   const EX_URL = (D.assistant?.chatUrl || '').replace(/\/chat$/, '/explain');
   const explainOf = (t) => {
@@ -505,11 +508,13 @@ function renderDirectory(T, catalogP) {
       ['Get it', get],
       t.rel ? ['Released', `${day(t.rel)} <i>· ${ago(t.rel, true)}</i>`, 'r-added'] : null,
       standing.get(t) ? ['Ranks', `No. ${fmt(standing.get(t))} of ${fmt(rankAll.size[t.c])} in ${esc(T.categories[t.c])}`] : null,
-      like ? ['Similar', like] : null,
+      like && !affOf(t) ? ['Similar', like] : null,
     ].filter(Boolean);
+    const aff = affOf(t);
     return `<span class="tool-back-head">${icon(t)}<span class="tool-back-kicker">${kicker}</span></span>
       <p class="tool-back-what"><span class="tl-skel-line"></span><span class="tl-skel-line short"></span></p>
-      <dl>${rows.map(([k, v, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+      <dl>${rows.map(([k, v, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>${aff
+        ? `<span class="tool-back-go"><a class="tool-back-cta" href="${esc(aff.u)}" target="_blank" rel="sponsored noopener">${esc(aff.cta || `Try ${t.n}`)} <b>↗</b></a><small>Affiliate link</small></span>` : ''}`;
   };
   const curatedTop = curated.filter((t) => t.pick).map((t) => t.n);
   const card = (t, k) => {
@@ -523,7 +528,7 @@ function renderDirectory(T, catalogP) {
       <div class="tool tool-front${t.src === 'pick' ? '' : ' cat'}" role="button" tabindex="0" aria-label="${esc(t.n)} – turn over for details">
       <span class="tool-top">
         ${icon(t)}
-        <span class="tool-flags">${rank}${t.uses ? `<span class="tool-uses">${esc(t.uses)}</span>` : ''}${isNew ? '<span class="tool-new">New</span>' : ''}${t.pick ? '<span class="tool-pick" title="One of Raunak\'s picks">★</span>' : ''}${rising.has(t.i) && S.sort !== 'rising' ? '<span class="tool-rise" title="Climbing fast right now">↑ Rising</span>' : ''}${pop}<button type="button" class="tool-save" aria-pressed="${saved.has(keyFor(t))}" aria-label="Save ${esc(t.n)}" title="Save">${HEART}</button><a class="tool-go" href="${esc(t.u)}" target="_blank" rel="noopener" aria-label="Open ${esc(t.n)} (${esc(host(t.u))})" title="Open ${esc(host(t.u))}">↗</a></span>
+        <span class="tool-flags">${rank}${t.uses ? `<span class="tool-uses">${esc(t.uses)}</span>` : ''}${isNew ? '<span class="tool-new">New</span>' : ''}${t.pick ? '<span class="tool-pick" title="One of Raunak\'s picks">★</span>' : ''}${rising.has(t.i) && S.sort !== 'rising' ? '<span class="tool-rise" title="Climbing fast right now">↑ Rising</span>' : ''}${pop}<button type="button" class="tool-save" aria-pressed="${saved.has(keyFor(t))}" aria-label="Save ${esc(t.n)}" title="Save">${HEART}</button><a class="tool-go" href="${esc(linkOf(t))}" target="_blank" rel="${affOf(t) ? 'sponsored noopener' : 'noopener'}" aria-label="Open ${esc(t.n)} (${esc(host(t.u))})" title="Open ${esc(host(t.u))}">↗</a></span>
       </span>
       <h3>${esc(t.n)}</h3>
       ${t.src === 'ph' ? `<span class="tool-by">Product Hunt${when}</span>` : t.by ? `<span class="tool-by">${t.src === 'gh' ? 'GitHub' : 'Hugging Face'} · ${esc(t.by)}${when}</span>` : when ? `<span class="tool-by">Added${when}</span>` : ''}
@@ -557,8 +562,13 @@ function renderDirectory(T, catalogP) {
   };
   grid.addEventListener('click', (e) => {
     const c = e.target.closest('.tool-card');
-    if (c && e.target.closest('.tool-go')) { const t = byI.get(+c.dataset.i); window.track?.('tool_open', t.n, null, { src: t.src, key: keyFor(t), href: t.u }); }
-    if (!c || e.target.closest('.tool-go')) return;   // (↗ only opens the page)
+    const out = c && e.target.closest('.tool-go, .tool-back-cta');
+    if (out) {   // (the link as it is now: an affiliate link set after the card was drawn still counts)
+      const t = byI.get(+c.dataset.i);
+      out.href = linkOf(t);
+      window.track?.('tool_open', t.n, null, { src: t.src, key: keyFor(t), href: out.href, aff: affOf(t) ? 1 : undefined, via: out.matches('.tool-back-cta') ? 'card' : undefined });
+    }
+    if (!c || out) return;   // (↗, and an affiliate button on the back, only open the page)
     const sv = e.target.closest('.tool-save');
     if (sv) {   // (♥ saves it, or lets it go)
       const k = keyFor(byI.get(+c.dataset.i));
@@ -573,7 +583,7 @@ function renderDirectory(T, catalogP) {
   });
   grid.addEventListener('keydown', (e) => {
     const side = e.target.closest('.tool-front, .tool-back');
-    if (!side || e.target.closest('.tool-go, .tool-save')) return;
+    if (!side || e.target.closest('.tool-go, .tool-save, .tool-back-cta')) return;
     if (e.key === 'Enter' || e.key === ' ' || (e.key === 'Escape' && side.classList.contains('tool-back'))) {
       e.preventDefault();
       turn(side.closest('.tool-card'), side.classList.contains('tool-front'));
@@ -683,8 +693,12 @@ function renderDirectory(T, catalogP) {
   fromURL();
   drawViews();
   draw();
+  affReady.then(() => grid.querySelectorAll('.tool-card').forEach((c) => {
+    const t = byI.get(+c.dataset.i), a = t && c.querySelector('.tool-go');
+    if (a) { a.href = linkOf(t); a.rel = affOf(t) ? 'sponsored noopener' : 'noopener'; }
+  }));
   const askApi = initAsk({
-    all: () => all, keyFor, icon, esc, cats: T.categories, prices: PRICES, loaded: catalogP, fix: (q) => fixQ(q.toLowerCase()),
+    all: () => all, keyFor, linkOf, icon, esc, cats: T.categories, prices: PRICES, loaded: catalogP, fix: (q) => fixQ(q.toLowerCase()),
     show(rest, q) { askRest = rest; askQ = q.trim().toLowerCase(); S.q = askQ; S.ask = '1'; S.limit = 24; draw(); toURL(false); },
     hide() { askRest = null; askQ = ''; if (S.ask) { S.ask = ''; draw(); toURL(false); } },
     // (closing Radar clears the question too: back to the whole directory)
@@ -716,6 +730,15 @@ function renderDirectory(T, catalogP) {
 // the likeliest few dozen by their words; Ronie's worker (POST /ask) reads those and chooses. The rest of the likely
 // ones fill the grid below, so there's always more to look through.
 const ASK_URL = (D.assistant?.chatUrl || '').replace(/\/chat$/, '/ask');
+// Raunak's affiliate links, set in HQ (hq.html → Radar → Affiliate links): a tool's key → { u: where its links go, cta }.
+// Kept in this browser too, so the links are right from the first card even before the worker answers.
+const AFF_URL = (D.assistant?.chatUrl || '').replace(/\/chat$/, '/aff');
+let AFF = {};
+try { AFF = JSON.parse(localStorage.getItem('rp-aff') || '{}') || {}; } catch { /* private mode */ }
+const affReady = !AFF_URL ? Promise.resolve() : fetch(AFF_URL, { signal: AbortSignal.timeout(8000) })
+  .then((r) => (r.ok ? r.json() : null))
+  .then((j) => { if (j && j.links && typeof j.links === 'object') { AFF = j.links; try { localStorage.setItem('rp-aff', JSON.stringify(AFF)); } catch { /* */ } } })
+  .catch(() => {});
 const STOP = new Set('a an and any app apps are best can could do does find for from get give good great help how i if in into is it its like make me my need of on or please recommend something some suggest that the thing this to tool tools use using want way what which with without would you your ai an'.split(' '));
 const ALSO = {
   podcast: ['audio', 'voice', 'speech'], podcasts: ['audio', 'voice'], clip: ['video', 'short'], clips: ['video', 'short'],
@@ -738,7 +761,7 @@ const words = (q) => q.toLowerCase().split(/[^a-z0-9+#]+/).filter((w) => w.lengt
 // (a question, rather than a search: three words or more, two of them meaningful)
 const askable = (q) => words(q).length >= 2 && q.trim().split(/\s+/).length >= 3;
 
-function initAsk({ all, keyFor, icon, esc: e, cats, prices, loaded, show, hide, clear, fix }) {
+function initAsk({ all, keyFor, linkOf, icon, esc: e, cats, prices, loaded, show, hide, clear, fix }) {
   const search = $('#tl-search'), btn = $('#tl-ask'), box = $('#tl-answer');
   if (!btn || !box || !ASK_URL) return { ask() {} };
   btn.hidden = false;
@@ -852,7 +875,7 @@ function initAsk({ all, keyFor, icon, esc: e, cats, prices, loaded, show, hide, 
     const meta = (t) => `${e(cats[t.c] || '')}${prices[t.p] ? ` · ${prices[t.p]}` : ''}`;
     box.innerHTML = (list.length
       ? head(found.length ? `${MARK}<b>Radar</b> suggests, for “${e(q)}”` : `${MARK}<b>Radar</b> ${failed ? 'couldn’t reach its helper just now' : 'isn’t sure'}. Here are the closest matches for “${e(q)}”`)
-        + `<ol class="tl-answer-list">${list.map(([t, why], k) => `<li><a href="${e(t.u)}" target="_blank" rel="noopener"><span class="tl-answer-n">${k + 1}</span>${icon(t)}<span class="tl-answer-t"><b>${e(t.n)}</b><span>${e(why || t.d)}</span><i>${meta(t)}</i></span><span class="ar" aria-hidden="true">↗</span></a></li>`).join('')}</ol>`
+        + `<ol class="tl-answer-list">${list.map(([t, why], k) => `<li><a href="${e(linkOf(t))}" target="_blank" rel="${linkOf(t) !== t.u ? 'sponsored noopener' : 'noopener'}" data-key="${e(keyFor(t))}"><span class="tl-answer-n">${k + 1}</span>${icon(t)}<span class="tl-answer-t"><b>${e(t.n)}</b><span>${e(why || t.d)}</span><i>${meta(t)}</i></span><span class="ar" aria-hidden="true">↗</span></a></li>`).join('')}</ol>`
         + `<p class="tl-answer-foot">Not quite it? Add a detail and Radar will look again.${rest.length ? ` <button type="button" class="tl-answer-more">${fmt(rest.length)} more related tools below ↓</button>` : ''}</p>`
       : head(`${MARK}<b>Radar</b> found nothing for “${e(q)}”`)
         + `<p class="tl-answer-none">Try saying what you want to make or do, for example:</p><div class="tl-answer-try">${chips(EXAMPLES.slice(0, 5))}</div>`);

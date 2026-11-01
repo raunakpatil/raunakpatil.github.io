@@ -140,7 +140,7 @@ function start() {
 // ---------- tabs & range ----------
 function route() {
   const t = location.hash.replace('#', '');
-  S.tab = ['overview', 'people', 'ronie', 'radar', 'work'].includes(t) ? t : 'overview';
+  S.tab = ['overview', 'people', 'ronie', 'radar', 'work', 'affiliates'].includes(t) ? t : 'overview';
   $$('#tabs a').forEach((a) => a.classList.toggle('active', a.dataset.tab === S.tab));
   $$('.view').forEach((v) => { v.hidden = v.dataset.view !== S.tab; });
   moveIndicator();
@@ -153,7 +153,7 @@ function moveIndicator() {
   ind.style.transform = `translateX(${a.offsetLeft}px)`;
 }
 addEventListener('hashchange', route);
-addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && render(), 200); });
+addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && S.tab !== 'affiliates' && render(), 200); });   // (the form keeps what's typed: a phone's keyboard resizes the page)
 document.fonts?.ready.then(moveIndicator);
 $$('#range button').forEach((b) => {
   b.setAttribute('aria-pressed', String(+b.dataset.days === S.days));
@@ -529,6 +529,87 @@ VIEWS.radar = (d) => {
 };
 AFTER.radar = (v) => bindRows(v);
 
+// ---------- Affiliates: Radar's cards that go through Raunak's affiliate links ----------
+// Every tool on Radar has a key (pick:Runway, gh:owner/repo, hf:owner/space, ph:slug); a link set here for a key replaces
+// that tool's ↗ on Radar, and its card's back gets a button to it (with "Affiliate link" under it).
+let toolList = null;
+const loadTools = () => (toolList ||= Promise.all([
+  fetch('data/tools.json').then((r) => r.json()).catch(() => ({ tools: [] })),
+  fetch('data/catalog.json').then((r) => r.json()).catch(() => ({})),
+]).then(([T, C]) => [
+  ...T.tools.map((t) => ({ key: `pick:${t.n}`, name: t.n, url: t.u, src: 'Hand-picked', pop: 1e9 })),
+  ...(C.ph || []).map((r) => ({ key: `ph:${r[1]}`, name: r[0], url: r[7], src: 'Product Hunt', pop: r[3] })),
+  ...(C.gh || []).map((r) => ({ key: `gh:${r[1]}`, name: r[0], url: `https://github.com/${r[1]}`, src: 'GitHub', pop: r[3] })),
+  ...(C.hf || []).map((r) => ({ key: `hf:${r[1]}`, name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, src: 'HF Space', pop: r[3] })),
+]));
+const SRCNAME = { pick: 'Hand-picked', gh: 'GitHub', hf: 'HF Space', ph: 'Product Hunt' };
+VIEWS.affiliates = () => card('s12', 'link', 'Add an affiliate link', `<form class="aff-form" id="aff-form" autocomplete="off">
+    <label class="aff-f aff-tool"><span>Tool on Radar</span>
+      <input class="search" id="aff-q" placeholder="Start typing a tool's name, e.g. Runway" required>
+      <div class="aff-menu" id="aff-menu" hidden></div></label>
+    <label class="aff-f"><span>Your affiliate link</span><input class="search" id="aff-url" type="url" placeholder="https://runwayml.com/?ref=…" required></label>
+    <label class="aff-f aff-cta"><span>Button text <i>(optional)</i></span><input class="search" id="aff-cta" maxlength="40" placeholder="Try Runway"></label>
+    <button class="go-dark" type="submit" id="aff-save">Save</button>
+    <p class="aff-pick" id="aff-pick"></p>
+  </form>
+  <p class="aff-help">On Radar, this tool's ↗ goes through your link, and the back of its card gets a button to it, marked “Affiliate link”. Live for visitors within about five minutes.</p>`)
+  + card('s12', 'out', 'Your affiliate links', '<div id="aff-list"><p class="empty">Loading…</p></div>', 'clicks are people following the link from Radar');
+AFTER.affiliates = async (v) => {
+  let chosen = null;
+  const q = $('#aff-q', v), menu = $('#aff-menu', v), pickEl = $('#aff-pick', v), list = $('#aff-list', v);
+  const choose = (t) => {
+    chosen = t; q.value = t.name; menu.hidden = true;
+    pickEl.innerHTML = `<span class="tag">${esc(t.src)}</span> ${esc(t.name)} · now goes to <span class="mono">${esc(host(t.url))}</span>`;
+    $('#aff-url', v).focus();
+  };
+  q.addEventListener('input', async () => {
+    chosen = null; pickEl.textContent = '';
+    const term = q.value.trim().toLowerCase();
+    if (term.length < 2) { menu.hidden = true; return; }
+    const all = await loadTools();
+    const hits = all.filter((t) => t.name.toLowerCase().includes(term))
+      .sort((a, b) => (b.name.toLowerCase().startsWith(term) - a.name.toLowerCase().startsWith(term)) || b.pop - a.pop).slice(0, 8);
+    menu.innerHTML = hits.length ? hits.map((t, i) => `<button type="button" data-i="${i}"><b>${esc(t.name)}</b><span>${esc(t.src)} · ${esc(host(t.url))}</span></button>`).join('') : '<p class="empty">No tool by that name on Radar.</p>';
+    menu.hidden = false;
+    $$('button', menu).forEach((b) => b.addEventListener('click', () => choose(hits[+b.dataset.i])));
+  });
+  q.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !menu.hidden) { e.preventDefault(); $('button', menu)?.click(); } if (e.key === 'Escape') menu.hidden = true; });
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.aff-tool')) menu.hidden = true; });
+
+  const draw = (links) => {
+    list.innerHTML = !links.length ? empty('No affiliate links yet. Add one above.') : `<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Goes to</th><th>Button</th><th class="n">Clicks · 30d</th><th class="n">All time</th><th class="n">Card views · 30d</th><th></th></tr></thead><tbody>
+      ${links.map((l, i) => `<tr data-i="${i}" style="cursor:default"><td><b style="font-weight:500">${esc(l.name || l.key.split(':').slice(1).join(':'))}</b><span class="sub">${esc(SRCNAME[l.key.split(':')[0]] || '')}</span></td>
+        <td><a href="${esc(l.url)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(host(l.url))}</a><span class="sub mono" style="word-break:break-all">${esc(l.url.length > 70 ? `${l.url.slice(0, 70)}…` : l.url)}</span></td>
+        <td>${esc(l.cta || `Try ${l.name || ''}`)}</td><td class="n">${fmt(l.clicks30)}</td><td class="n">${fmt(l.clicks)}</td><td class="n">${fmt(l.views30)}</td>
+        <td class="n" style="white-space:nowrap"><button class="pill" type="button" data-edit="${i}">Edit</button> <button class="pill" type="button" data-del="${i}">Remove</button></td></tr>`).join('')}
+    </tbody></table></div>`;
+    $$('[data-edit]', list).forEach((b) => b.addEventListener('click', () => {
+      const l = links[+b.dataset.edit];
+      choose({ key: l.key, name: l.name || l.key, url: l.url, src: SRCNAME[l.key.split(':')[0]] || '' });
+      $('#aff-url', v).value = l.url; $('#aff-cta', v).value = l.cta || '';
+      v.scrollIntoView({ behavior: 'smooth' });
+    }));
+    $$('[data-del]', list).forEach((b) => b.addEventListener('click', async () => {
+      const l = links[+b.dataset.del];
+      if (!confirm(`Remove the affiliate link for ${l.name || l.key}? Its card goes back to its own page.`)) return;
+      try { draw((await api('/admin/affiliates/delete', { method: 'POST', body: JSON.stringify({ key: l.key }) })).links); } catch (err) { alert(err.message); }
+    }));
+  };
+  $('#aff-form', v).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!chosen) { pickEl.innerHTML = '<span style="color:var(--pink)">Pick the tool from the list as you type.</span>'; q.focus(); return; }
+    const btn = $('#aff-save', v); btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      const j = await api('/admin/affiliates', { method: 'POST', body: JSON.stringify({ key: chosen.key, name: chosen.name, url: $('#aff-url', v).value.trim(), cta: $('#aff-cta', v).value.trim() }) });
+      draw(j.links);
+      pickEl.innerHTML = `<span style="color:var(--mint)">Saved.</span> ${esc(chosen.name)} now goes through your link on Radar.`;
+      chosen = null; q.value = ''; $('#aff-url', v).value = ''; $('#aff-cta', v).value = '';
+    } catch (err) { pickEl.innerHTML = `<span style="color:var(--pink)">${esc(err.message)}</span>`; }
+    btn.disabled = false; btn.textContent = 'Save';
+  });
+  try { draw((await api('/admin/affiliates')).links); } catch (err) { list.innerHTML = empty(`Couldn’t load: ${err.message}`); }
+};
+
 // ---------- Work: projects, the library, clicks ----------
 VIEWS.work = (d) => {
   const by = (kind) => d.opens.filter((o) => (o.kind || 'project') === kind).map((o) => ({ k: esc(o.label), n: o.n, sub: `${o.people} ${o.people === 1 ? 'person' : 'people'}` }));
@@ -645,13 +726,20 @@ setInterval(async () => {
 
 // =================================== demo data ===================================
 // Made-up visitors, so the page can be seen (and its look checked) before the database exists: hq.html?demo
-function demoApi(path) {
+function demoApi(path, opts = {}) {
   const D = (demoApi.d ||= makeDemo());
   if (path.startsWith('/admin/stats')) {
     const days = +new URLSearchParams(path.split('?')[1]).get('days') || 30;
     return Promise.resolve(D.stats(days));
   }
   if (path.startsWith('/admin/visitor')) return Promise.resolve(D.visitor(new URLSearchParams(path.split('?')[1]).get('vid')));
+  if (path.startsWith('/admin/affiliates')) {
+    const A = (demoApi.aff ||= [{ key: 'pick:Runway', name: 'Runway', url: 'https://runwayml.com/?via=raunak', cta: 'Try Runway free', updated: Date.now(), clicks: 41, clicks30: 17, views30: 63 }]);
+    const b = opts.body ? JSON.parse(opts.body) : null;
+    if (path.endsWith('/delete')) demoApi.aff = A.filter((x) => x.key !== b.key);
+    else if (b) { demoApi.aff = [{ ...b, updated: Date.now(), clicks: 0, clicks30: 0, views30: 0 }, ...A.filter((x) => x.key !== b.key)]; }
+    return Promise.resolve({ links: demoApi.aff });
+  }
   if (path.startsWith('/admin/insights')) {
     return new Promise((r) => setTimeout(() => r({ text: `WHO IS VISITING
 - Mostly recruiters and engineering managers from the UK and India; a few students curious about RAG.

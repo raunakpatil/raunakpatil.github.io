@@ -98,7 +98,7 @@
     if (el.matches('a.tl-row')) return track('news_open', txt('.tl-h'), null, { source: txt('.tl-src'), href: el.href.slice(0, 300) });
     if (el.matches('a.tl-model')) return track('model_open', txt('.tl-model-name'), null, { maker: txt('.tl-model-top span'), href: el.href.slice(0, 300) });
     if (el.matches('a.tl-lead-link')) return track('news_open', txt('h2'), null, { source: txt('.tl-kicker').split('·')[0].trim(), href: el.href.slice(0, 300), lead: 1 });
-    if (el.matches('.tl-answer-list a')) return track('tool_open', txt('b'), null, { via: 'ask', href: el.href.slice(0, 300) });
+    if (el.matches('.tl-answer-list a')) return track('tool_open', txt('b'), null, { via: 'ask', key: el.dataset.key || undefined, aff: /sponsored/.test(el.rel) ? 1 : undefined, href: el.href.slice(0, 300) });
     if (el.closest(OWN)) return;
     var label = (el.getAttribute('aria-label') || el.textContent || el.title || '').replace(/\s+/g, ' ').trim().slice(0, 80);
     // (a button in the project popup says which project it was)
