@@ -251,25 +251,31 @@ tbody tr:hover { background: #1b1b1b; }
 .cloud span { padding: 5px 11px; border-radius: 999px; background: #1f1f1f; font-size: calc(11px + var(--s, 0) * 7px); color: var(--on-card); }
 .cloud span small { margin-left: 6px; font-family: var(--mono); font-size: 10px; color: var(--on-card-3); }
 
-/* affiliate links */
-.aff-form { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, .9fr) auto; gap: 12px; align-items: end; }
-.aff-f { position: relative; display: grid; gap: 7px; min-width: 0; }
-.aff-f > span { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--on-card-3); }
-.aff-f > span i { font-style: normal; text-transform: none; letter-spacing: 0; }
-.aff-f .search { width: 100%; min-width: 0; }
-.aff-form .go-dark { height: 38px; justify-content: center; }
-.aff-pick { grid-column: 1 / -1; min-height: 1.2em; font-size: 12.5px; color: var(--on-card-2); }
-.aff-help { margin-top: 6px; font-size: 12.5px; color: var(--on-card-3); }
-.aff-menu {
-  position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: 6px; padding: 6px; border-radius: 14px;
-  background: #1f1f1f; box-shadow: 0 14px 40px rgba(0, 0, 0, .55); max-height: 330px; overflow: auto;
+/* affiliate links: every tool on Radar, each row with its site, a search for its programme and a place for the link */
+.aff-help { font-size: 13px; color: var(--on-card-2); line-height: 1.5; }
+.aff-help b { font-weight: 500; color: var(--on-card); }
+.aff-count { margin: -2px 0 10px; font-size: 10.5px; color: var(--on-card-3); letter-spacing: .04em; }
+.aff-dir { display: grid; gap: 4px; }
+.aff-row {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.9fr); gap: 14px; align-items: center;
+  padding: 10px 12px; border-radius: 12px; background: var(--card-2); border-left: 2px solid transparent;
 }
-.aff-menu button { display: grid; width: 100%; text-align: left; padding: 8px 10px; border-radius: 9px; }
-.aff-menu button:hover, .aff-menu button:focus-visible { background: #2a2a2a; }
-.aff-menu b { font-weight: 500; font-size: 13.5px; }
-.aff-menu span { font-family: var(--mono); font-size: 10.5px; color: var(--on-card-3); }
-.card:has(.aff-form) { overflow: visible; z-index: 5; }
-@media (max-width: 860px) { .aff-form { grid-template-columns: 1fr; } }
+.aff-row.on { border-left-color: var(--mint); }
+.aff-tool-c { min-width: 0; }
+.aff-tool-c b { font-weight: 500; font-size: 14px; }
+.aff-tool-c .sub { display: block; margin-top: 2px; color: var(--on-card-3); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aff-go { display: flex; gap: 6px; flex-wrap: wrap; }
+.aff-go .pill { white-space: nowrap; font-size: 11.5px; padding: 6px 11px; }
+.aff-go .pill:hover { background: #2a2a2a; color: var(--on-card); }
+.aff-go .aff-find { color: var(--amber); }
+.aff-in { display: flex; gap: 6px; min-width: 0; }
+.aff-in .search { min-width: 0; padding: 7px 12px; font-size: 12.5px; }
+.aff-in .aff-url { flex: 2.2; }
+.aff-in .aff-cta { flex: 1; }
+.aff-in .go-dark { padding: 7px 14px; font-size: 12.5px; flex: none; }
+.aff-in .pill { flex: none; }
+@media (max-width: 1180px) { .aff-row { grid-template-columns: minmax(0, 1fr) auto; } .aff-in { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .aff-row { grid-template-columns: 1fr; } .aff-in { flex-wrap: wrap; } .aff-in .aff-url { flex-basis: 100%; } }
 
 /* the visitor drawer */
 .drawer {

@@ -458,7 +458,7 @@ function renderDirectory(T, catalogP) {
   };
   const keyFor = (t) => (t.src === 'pick' ? `pick:${t.n}` : t.src === 'gh' ? `gh:${t.u.replace('https://github.com/', '')}`
     : t.src === 'hf' ? `hf:${t.u.replace('https://huggingface.co/spaces/', '')}` : `ph:${t.slug}`);
-  // where a tool's links go: Raunak's affiliate link when he has one for it, else its own page
+  // where a tool's links go: Raunak's own link when he has one for it, else its own page
   const affOf = (t) => { const a = AFF[keyFor(t)]; return a && /^https?:\/\//.test(a.u) ? a : null; };
   const linkOf = (t) => (affOf(t) ? affOf(t).u : t.u);
   const EX = new Map();
@@ -563,12 +563,12 @@ function renderDirectory(T, catalogP) {
   grid.addEventListener('click', (e) => {
     const c = e.target.closest('.tool-card');
     const out = c && e.target.closest('.tool-go, .tool-back-cta');
-    if (out) {   // (the link as it is now: an affiliate link set after the card was drawn still counts)
+    if (out) {   // (the link as it is now: one set after the card was drawn still counts)
       const t = byI.get(+c.dataset.i);
       out.href = linkOf(t);
       window.track?.('tool_open', t.n, null, { src: t.src, key: keyFor(t), href: out.href, aff: affOf(t) ? 1 : undefined, via: out.matches('.tool-back-cta') ? 'card' : undefined });
     }
-    if (!c || out) return;   // (↗, and an affiliate button on the back, only open the page)
+    if (!c || out) return;   // (↗, and the button on the back, only open the page)
     const sv = e.target.closest('.tool-save');
     if (sv) {   // (♥ saves it, or lets it go)
       const k = keyFor(byI.get(+c.dataset.i));
@@ -730,7 +730,7 @@ function renderDirectory(T, catalogP) {
 // the likeliest few dozen by their words; Ronie's worker (POST /ask) reads those and chooses. The rest of the likely
 // ones fill the grid below, so there's always more to look through.
 const ASK_URL = (D.assistant?.chatUrl || '').replace(/\/chat$/, '/ask');
-// Raunak's affiliate links, set in HQ (hq.html → Radar → Affiliate links): a tool's key → { u: where its links go, cta }.
+// Raunak's own links for some tools, set in HQ: a tool's key → { u: where its links go, cta }.
 // Kept in this browser too, so the links are right from the first card even before the worker answers.
 const AFF_URL = (D.assistant?.chatUrl || '').replace(/\/chat$/, '/aff');
 let AFF = {};

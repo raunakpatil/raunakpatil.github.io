@@ -227,12 +227,13 @@ passphrase (any long random string; HQ asks for it) and deploy:
 npx -y -p node@22 -p wrangler@4 -- wrangler secret put ADMIN_TOKEN
 npx -y -p node@22 -p wrangler@4 -- wrangler deploy
 ```
-**Affiliate links** (HQ → Links): pick a tool on Radar by name, paste your affiliate link (and, if you like, the
-button's words), Save. On Radar that tool's ↗ and its Ask Radar answer then go through your link (`rel="sponsored"`),
-and the back of its card gets a button to it (no label on the site says it's an affiliate link). The links live in the worker's database
+**Affiliate links** (HQ → Affiliate links): every tool on Radar is listed there, searchable (hand-picked, Top 50,
+Product Hunt, everything, the ones with your link, paid ones), each with its website and **Find program ↗** (a search
+for its affiliate program). Sign up, paste your link into the tool's row (and, if you like, the button's words), Save.
+On Radar that tool's ↗ and its Ask Radar answer then go through your link (`rel="sponsored"`), and the back of its
+card gets a "Try …" button to it; Radar never says "affiliate" anywhere. The links live in the worker's database
 (`affiliates` table), which Radar reads from `GET /aff` on every visit (cached five minutes), so nothing needs
-deploying. The list shows how often each link was followed. The `/ai-tools` pages are static and keep the tools'
-own links.
+deploying. HQ shows how often each link was followed. The `/ai-tools` pages are static and keep the tools' own links.
 
 The tables create themselves on the first event. Until the database exists the worker simply ignores the beacon.
 Since the site now records names, emails and approximate locations, the site should say so (a line in Ronie's
