@@ -140,7 +140,7 @@ function start() {
 // ---------- tabs & range ----------
 function route() {
   const t = location.hash.replace('#', '');
-  S.tab = ['overview', 'people', 'ronie', 'radar', 'work'].includes(t) ? t : 'overview';
+  S.tab = ['overview', 'people', 'ronie', 'radar', 'work', 'affiliates'].includes(t) ? t : 'overview';
   $$('#tabs a').forEach((a) => a.classList.toggle('active', a.dataset.tab === S.tab));
   $$('.view').forEach((v) => { v.hidden = v.dataset.view !== S.tab; });
   moveIndicator();
@@ -153,7 +153,7 @@ function moveIndicator() {
   ind.style.transform = `translateX(${a.offsetLeft}px)`;
 }
 addEventListener('hashchange', route);
-addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && render(), 200); });
+addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && S.tab !== 'affiliates' && render(), 200); });   // (the form keeps what's typed: a phone's keyboard resizes the page)
 document.fonts?.ready.then(moveIndicator);
 $$('#range button').forEach((b) => {
   b.setAttribute('aria-pressed', String(+b.dataset.days === S.days));
@@ -529,6 +529,108 @@ VIEWS.radar = (d) => {
 };
 AFTER.radar = (v) => bindRows(v);
 
+// ---------- Affiliate links: Radar's cards that go through Raunak's affiliate links ----------
+// Every tool on Radar has a key (pick:Runway, gh:owner/repo, hf:owner/space, ph:slug); a link set here for a key replaces
+// that tool's ↗ on Radar, and its card's back gets a button to it. (Radar itself never says the word "affiliate".)
+// The directory below lists every tool on Radar with its website and a search for its affiliate programme, so the
+// round trip is: find the tool, sign up to its programme, paste the link into its row, Save.
+let toolList = null;
+const loadTools = () => (toolList ||= Promise.all([
+  fetch('data/tools.json').then((r) => r.json()).catch(() => ({ tools: [], categories: {} })),
+  fetch('data/catalog.json').then((r) => r.json()).catch(() => ({})),
+]).then(([T, C]) => {
+  const cat = (c) => (T.categories || {})[c] || '';
+  return [
+    ...T.tools.map((t, i) => ({ key: `pick:${t.n}`, name: t.n, url: t.u, src: 'Hand-picked', group: 'pick', top: !!t.pick, cat: cat(t.c), price: t.p, pop: 1e9 - i, d: t.d })),
+    ...(C.ph || []).map((r) => ({ key: `ph:${r[1]}`, name: r[0], url: r[7], src: 'Product Hunt', group: 'ph', cat: cat(r[4]), price: r[6], pop: r[3], d: r[2] })),
+    ...(C.gh || []).map((r) => ({ key: `gh:${r[1]}`, name: r[0], url: `https://github.com/${r[1]}`, src: 'GitHub', group: 'gh', cat: cat(r[4]), price: 'open', pop: r[3], d: r[2] })),
+    ...(C.hf || []).map((r) => ({ key: `hf:${r[1]}`, name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, src: 'HF Space', group: 'hf', cat: cat(r[4]), price: 'free', pop: r[3], d: r[2] })),
+  ];
+}));
+const SRCNAME = { pick: 'Hand-picked', gh: 'GitHub', hf: 'HF Space', ph: 'Product Hunt' };
+const programSearch = (name, url) => `https://www.google.com/search?q=${encodeURIComponent(`${name} ${host(url) && !/github\.com|huggingface\.co|producthunt\.com/.test(host(url)) ? `${host(url)} ` : ''}affiliate program`)}`;
+const AFFV = { q: '', f: 'pick', limit: 60 };
+VIEWS.affiliates = () => card('s12', 'out', 'Your affiliate links', '<div id="aff-list"><p class="empty">Loading…</p></div>', 'clicks = people following your link from Radar')
+  + card('s12', 'search', 'Every tool on Radar', `<p class="aff-help" style="margin:0 0 14px">Find a tool, open <b>Find program ↗</b> to sign up to its affiliate program, then paste your link into its row and press Save. On Radar its ↗ and a “Try …” button on the back of its card go through your link within about five minutes.</p>
+    <div class="filter-row">
+      <input class="search" id="aff-q" type="search" placeholder="Search Radar's tools by name, site or category…" value="${esc(AFFV.q)}">
+      ${[['pick', 'Hand-picked'], ['top', 'Top 50'], ['ph', 'Product Hunt'], ['all', 'Everything'], ['has', 'With my link'], ['paid', 'Paid / freemium']].map(([k, l]) => `<button class="pill" type="button" data-af="${k}" aria-pressed="${AFFV.f === k}">${l}</button>`).join('')}
+    </div>
+    <p class="aff-count mono" id="aff-count"></p>
+    <div id="aff-dir"><p class="empty">Loading Radar's tools…</p></div>`);
+AFTER.affiliates = async (v) => {
+  const list = $('#aff-list', v), dir = $('#aff-dir', v), count = $('#aff-count', v);
+  let links = [];
+  const byKey = () => new Map(links.map((l) => [l.key, l]));
+  const save = async (t, url, cta) => {
+    links = (await api('/admin/affiliates', { method: 'POST', body: JSON.stringify({ key: t.key, name: t.name, url, cta }) })).links;
+    drawLinks(); drawDir();
+  };
+  const remove = async (key, name) => {
+    if (!confirm(`Remove your affiliate link for ${name}? Its card on Radar goes back to the tool's own page.`)) return;
+    try { links = (await api('/admin/affiliates/delete', { method: 'POST', body: JSON.stringify({ key }) })).links; drawLinks(); drawDir(); } catch (err) { alert(err.message); }
+  };
+  function drawLinks() {
+    list.innerHTML = !links.length ? empty('No affiliate links yet. Find a tool below and paste your link into its row.') : `<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Affiliate link</th><th>Button on Radar</th><th class="n">Clicks · 30d</th><th class="n">All time</th><th class="n">Card views · 30d</th><th></th></tr></thead><tbody>
+      ${links.map((l, i) => `<tr style="cursor:default"><td><b style="font-weight:500">${esc(l.name || l.key.split(':').slice(1).join(':'))}</b><span class="sub">${esc(SRCNAME[l.key.split(':')[0]] || '')}</span></td>
+        <td><a href="${esc(l.url)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(host(l.url))}</a><span class="sub mono" style="word-break:break-all">${esc(l.url.length > 70 ? `${l.url.slice(0, 70)}…` : l.url)}</span></td>
+        <td>${esc(l.cta || `Try ${l.name || ''}`)}</td><td class="n">${fmt(l.clicks30)}</td><td class="n">${fmt(l.clicks)}</td><td class="n">${fmt(l.views30)}</td>
+        <td class="n" style="white-space:nowrap"><button class="pill" type="button" data-edit="${i}">Edit</button> <button class="pill" type="button" data-del="${i}">Remove</button></td></tr>`).join('')}
+    </tbody></table></div>`;
+    $$('[data-edit]', list).forEach((b) => b.addEventListener('click', () => {
+      const l = links[+b.dataset.edit];
+      AFFV.q = l.name || ''; AFFV.f = 'has'; $('#aff-q', v).value = AFFV.q;
+      $$('[data-af]', v).forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.af === 'has')));
+      drawDir();
+      const row = dir.querySelector(`[data-key="${CSS.escape(l.key)}"]`);
+      row?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row?.querySelector('.aff-url')?.focus({ preventScroll: true });
+    }));
+    $$('[data-del]', list).forEach((b) => b.addEventListener('click', () => { const l = links[+b.dataset.del]; remove(l.key, l.name || l.key); }));
+  }
+  let tools = [];
+  function drawDir() {
+    const have = byKey(), q = AFFV.q.trim().toLowerCase(), f = AFFV.f;
+    const rows = tools.filter((t) => (f === 'all' || (f === 'pick' && t.group === 'pick') || (f === 'top' && t.top) || (f === 'ph' && t.group === 'ph')
+        || (f === 'has' && have.has(t.key)) || (f === 'paid' && /paid|freemium/i.test(t.price || '')))
+      && (!q || `${t.name} ${host(t.url)} ${t.cat} ${t.src}`.toLowerCase().includes(q)))
+      .sort((a, b) => (have.has(b.key) - have.has(a.key)) || (q ? (b.name.toLowerCase().startsWith(q) - a.name.toLowerCase().startsWith(q)) : 0) || b.pop - a.pop);
+    count.textContent = `${fmt(rows.length)} tool${rows.length === 1 ? '' : 's'}${rows.length > AFFV.limit ? ` · showing ${fmt(AFFV.limit)}` : ''} · ${fmt(have.size)} with your link`;
+    const shown = rows.slice(0, AFFV.limit);
+    dir.innerHTML = !shown.length ? empty('No tool matches.') : `<div class="aff-dir">${shown.map((t) => {
+      const l = have.get(t.key);
+      return `<div class="aff-row${l ? ' on' : ''}" data-key="${esc(t.key)}">
+        <div class="aff-tool-c"><b>${esc(t.name)}</b>${l ? ' <span class="tag named">linked</span>' : ''}${t.top ? ' <span class="tag">top 50</span>' : ''}<span class="sub">${esc([t.cat, t.src, t.price && t.price !== 'na' ? t.price : ''].filter(Boolean).join(' · '))}</span></div>
+        <div class="aff-go"><a class="pill" href="${esc(t.url)}" target="_blank" rel="noopener" title="${esc(t.url)}">${esc(host(t.url) || 'Website')} ↗</a>
+          <a class="pill aff-find" href="${esc(programSearch(t.name, t.url))}" target="_blank" rel="noopener">Find program ↗</a></div>
+        <form class="aff-in"><input class="search aff-url" type="url" placeholder="Paste your affiliate link" value="${esc(l ? l.url : '')}" required>
+          <input class="search aff-cta" maxlength="40" placeholder="Try ${esc(t.name.slice(0, 30))}" value="${esc(l && l.cta ? l.cta : '')}">
+          <button class="go-dark" type="submit">${l ? 'Update' : 'Save'}</button>${l ? '<button class="pill aff-rm" type="button">Remove</button>' : ''}</form>
+      </div>`;
+    }).join('')}</div>${rows.length > AFFV.limit ? '<button class="pill aff-more" type="button" style="margin-top:12px">Show more</button>' : ''}`;
+    $$('.aff-row', dir).forEach((row) => {
+      const t = tools.find((x) => x.key === row.dataset.key);
+      $('.aff-in', row).addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const b = $('button[type="submit"]', row); b.disabled = true; b.textContent = 'Saving…';
+        try { await save(t, $('.aff-url', row).value.trim(), $('.aff-cta', row).value.trim()); } catch (err) { alert(err.message); b.disabled = false; b.textContent = 'Save'; }
+      });
+      $('.aff-rm', row)?.addEventListener('click', () => remove(t.key, t.name));
+    });
+    $('.aff-more', dir)?.addEventListener('click', () => { AFFV.limit += 60; drawDir(); });
+  }
+  let qt = 0;
+  $('#aff-q', v).addEventListener('input', (e) => { clearTimeout(qt); qt = setTimeout(() => { AFFV.q = e.target.value; AFFV.limit = 60; drawDir(); }, 120); });
+  $$('[data-af]', v).forEach((b) => b.addEventListener('click', () => {
+    AFFV.f = b.dataset.af; AFFV.limit = 60;
+    $$('[data-af]', v).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawDir();
+  }));
+  try { links = (await api('/admin/affiliates')).links; drawLinks(); } catch (err) { list.innerHTML = empty(`Couldn’t load: ${err.message}`); }
+  tools = await loadTools();
+  drawDir();
+};
+
 // ---------- Work: projects, the library, clicks ----------
 VIEWS.work = (d) => {
   const by = (kind) => d.opens.filter((o) => (o.kind || 'project') === kind).map((o) => ({ k: esc(o.label), n: o.n, sub: `${o.people} ${o.people === 1 ? 'person' : 'people'}` }));
@@ -645,13 +747,20 @@ setInterval(async () => {
 
 // =================================== demo data ===================================
 // Made-up visitors, so the page can be seen (and its look checked) before the database exists: hq.html?demo
-function demoApi(path) {
+function demoApi(path, opts = {}) {
   const D = (demoApi.d ||= makeDemo());
   if (path.startsWith('/admin/stats')) {
     const days = +new URLSearchParams(path.split('?')[1]).get('days') || 30;
     return Promise.resolve(D.stats(days));
   }
   if (path.startsWith('/admin/visitor')) return Promise.resolve(D.visitor(new URLSearchParams(path.split('?')[1]).get('vid')));
+  if (path.startsWith('/admin/affiliates')) {
+    const A = (demoApi.aff ||= [{ key: 'pick:Runway', name: 'Runway', url: 'https://runwayml.com/?via=raunak', cta: 'Try Runway free', updated: Date.now(), clicks: 41, clicks30: 17, views30: 63 }]);
+    const b = opts.body ? JSON.parse(opts.body) : null;
+    if (path.endsWith('/delete')) demoApi.aff = A.filter((x) => x.key !== b.key);
+    else if (b) { demoApi.aff = [{ ...b, updated: Date.now(), clicks: 0, clicks30: 0, views30: 0 }, ...A.filter((x) => x.key !== b.key)]; }
+    return Promise.resolve({ links: demoApi.aff });
+  }
   if (path.startsWith('/admin/insights')) {
     return new Promise((r) => setTimeout(() => r({ text: `WHO IS VISITING
 - Mostly recruiters and engineering managers from the UK and India; a few students curious about RAG.

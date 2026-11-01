@@ -2,7 +2,7 @@
 // Workers AI (free daily allowance). It only knows what's in facts.js, which is generated from js/data.js.
 import { FACTS } from './facts.js';
 import { buildFeed } from './feed.js';
-import { collect, logChat, admin } from './analytics.js';
+import { collect, logChat, admin, affiliatesPublic } from './analytics.js';
 
 const MODEL = '@cf/qwen/qwen3-30b-a3b-fp8';   // 30B mixture-of-experts, ~3B active: smart, but priced like a 3B model
 const ALLOWED = ['https://raunakpatil.com', 'https://www.raunakpatil.com', 'http://127.0.0.1:5173', 'http://localhost:5173'];
@@ -579,6 +579,8 @@ export default {
       if (!ALLOWED.includes(origin)) return json({ error: 'forbidden' }, 403, cors);
       return collect(request, env, ctx, cors, json);
     }
+    // Radar's affiliate links (set in HQ): read by every visitor's Radar, so open to all
+    if (request.method === 'GET' && path === '/aff') return affiliatesPublic(env, cors, json).catch(() => json({ links: {} }, 200, cors));
     if (path.startsWith('/admin/')) {
       if (!ALLOWED.includes(origin)) return json({ error: 'forbidden' }, 403, cors);
       return admin(request, env, ctx, cors, json, { generate });

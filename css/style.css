@@ -1784,6 +1784,15 @@ a.tool-go::after { content: ""; position: absolute; inset: -8px; }   /* (a bigge
 .tool-inner > .tool-back { position: absolute; inset: 0; height: auto; overflow: hidden; }   /* (always the front's size) */
 .tool-back > * { flex-shrink: 0; }   /* (each line keeps its height; the hint takes what's left) */
 .tool-back:focus-visible { outline: 2px solid #7c5cff; outline-offset: 2px; }
+/* a tool Raunak has his own link for (set in HQ → Links): a button to it at the foot of its back */
+.tool-back-go { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.tool-back-cta {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px;
+  background: #f3f3f3; color: #111; font-size: 12.5px; font-weight: 500; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .35); transition: transform .2s, background .2s;
+}
+.tool-back-cta b { font-weight: 400; }
+.tool-back-cta:hover, .tool-back-cta:focus-visible { background: #fff; transform: translateY(-1px); }
 /* the back's plain-words line (js: explainOf), and its shimmer while it's being written */
 .tool-back .tool-back-what {
   font-size: 13.5px; line-height: 1.45; color: #f1f1f1; letter-spacing: -.005em; min-height: 2.9em;
