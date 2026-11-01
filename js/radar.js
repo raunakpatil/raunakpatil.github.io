@@ -393,7 +393,19 @@ function renderDirectory(T, catalogP) {
   const AI_WORDS = /\b(ai|llms?|gpt[\w.-]*|agents?|agentic|models?|neural|ml|machine learning|deep learning|diffusion|transformers?|rag|embeddings?|chatbots?|vision|speech|tts|asr|stt|generative|prompts?|copilot|openai|anthropic|claude|gemini|llama|mistral|qwen|deepseek|ollama|langchain|inference|nlp|mcp|ocr|text-to-\w+|image-to-\w+|voice|lora|fine-?tun\w*|multimodal|reasoning|semantic)\b/i;
   const isFresh = (t) => t.rel && Date.now() - Date.parse(t.rel) < NEW_DAYS * 864e5 && (t.d || '').length >= 24
     && (t.src === 'gh' ? AI_WORDS.test(`${t.n} ${t.d}`) : t.src === 'hf' ? t.pop >= 50 : t.src !== 'pick');
-  const pool = () => (S.view === 'top' ? all.filter((t) => t.pick) : S.view === 'new' ? all.filter(isFresh) : all);
+  // The Top list: the first four picks stay where they are (ChatGPT, Claude, Gemini, Grok), then the tools Raunak has his
+  // own link for, in the order he added them in HQ, then the rest of his picks — still as many as he picked
+  const TOP_HEAD = 4;
+  const topList = () => {
+    const picks = all.filter((t) => t.pick).sort((a, b) => a.i - b.i);
+    const keys = Object.keys(AFF);
+    if (!keys.length) return picks;
+    const byKey = new Map(all.map((t) => [keyFor(t), t]));
+    const head = picks.slice(0, TOP_HEAD);
+    const own = keys.map((k) => byKey.get(k)).filter((t) => t && !head.includes(t));
+    return [...head, ...own, ...picks.filter((t) => !head.includes(t) && !own.includes(t))].slice(0, Math.max(picks.length, TOP_HEAD + own.length));
+  };
+  const pool = () => (S.view === 'top' ? topList() : S.view === 'new' ? all.filter(isFresh) : all);
   const tally = (skip, test) => pool().reduce((n, t) => n + (matches(t, skip) && test(t) ? 1 : 0), 0);
   const views = $('#tl-views');
   const drawViews = () => {
@@ -498,7 +510,7 @@ function renderDirectory(T, catalogP) {
   const back = (t) => {
     const get = t.src === 'pick' ? GET.pick[t.p].replace('{host}', esc(host(t.u))) : GET[t.src];
     const kicker = t.src === 'pick'
-      ? (t.mine ? 'Built by Raunak' : t.pick ? `★ Raunak's top ${all.filter((x) => x.pick).length} · No. ${curatedTop.indexOf(t.n) + 1}` : 'Hand-picked by Raunak')
+      ? (t.mine ? 'Built by Raunak' : topList().includes(t) ? `★ Raunak's top ${all.filter((x) => x.pick).length} · No. ${topList().indexOf(t) + 1}` : 'Hand-picked by Raunak')
       : t.src === 'gh' ? 'Open-source project' : t.src === 'ph' ? `Product Hunt launch · ▲ ${fmt(t.pop)}` : 'Hugging Face Space';
     // its neighbours in its category's ranking: the ones just above and below it
     const list = leaders[t.c] || [], at = (standing.get(t) || 1) - 1;
@@ -516,7 +528,6 @@ function renderDirectory(T, catalogP) {
       <dl>${rows.map(([k, v, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>${aff
         ? `<span class="tool-back-go"><a class="tool-back-cta" href="${esc(aff.u)}" target="_blank" rel="sponsored noopener">${esc(aff.cta || `Try ${t.n}`)} <b>↗</b></a></span>` : ''}`;
   };
-  const curatedTop = curated.filter((t) => t.pick).map((t) => t.n);
   const card = (t, k) => {
     const isNew = t.added && Date.now() - Date.parse(t.added) < 30 * 864e5;
     const rank = S.view === 'top' ? `<span class="tool-rank">${String(k + 1).padStart(2, '0')}</span>` : '';
@@ -603,7 +614,7 @@ function renderDirectory(T, catalogP) {
       const f = fixQ(S.q);
       if (f !== S.q) { effQ = f; items = pool().filter((t) => matches(t)); if (items.length) fixed = f; else effQ = S.q; }
     }
-    items = top ? items.sort((a, b) => a.i - b.i)
+    items = top ? items   // (already in its order: topList)
       : S.view === 'new' ? items.sort((a, b) => b.rel.localeCompare(a.rel) || a.i - b.i)
       : asking() && S.sort === 'picks' ? items
       : S.sort === 'az' ? items.sort((a, b) => a.n.localeCompare(b.n))
@@ -693,7 +704,7 @@ function renderDirectory(T, catalogP) {
   fromURL();
   drawViews();
   draw();
-  affReady.then(() => grid.querySelectorAll('.tool-card').forEach((c) => {
+  affReady.then(() => S.view === 'top' && draw()).then(() => grid.querySelectorAll('.tool-card').forEach((c) => {
     const t = byI.get(+c.dataset.i), a = t && c.querySelector('.tool-go');
     if (a) { a.href = linkOf(t); a.rel = affOf(t) ? 'sponsored noopener' : 'noopener'; }
   }));

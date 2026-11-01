@@ -231,7 +231,9 @@ npx -y -p node@22 -p wrangler@4 -- wrangler deploy
 Product Hunt, everything, the ones with your link, paid ones), each with its website and **Find program ↗** (a search
 for its affiliate program). Sign up, paste your link into the tool's row (and, if you like, the button's words), Save.
 On Radar that tool's ↗ and its Ask Radar answer then go through your link (`rel="sponsored"`), and the back of its
-card gets a "Try …" button to it; Radar never says "affiliate" anywhere. The links live in the worker's database
+card gets a "Try …" button to it; Radar never says "affiliate" anywhere. They also join Radar's **Top 50**: the first four picks stay
+(ChatGPT, Claude, Gemini, Grok), then the tools with your link, in the order you added them, then the rest of the picks
+(still 50; the last picks drop off). Removing a link and adding it again puts it at the end. The links live in the worker's database
 (`affiliates` table), which Radar reads from `GET /aff` on every visit (cached five minutes), so nothing needs
 deploying. HQ shows how often each link was followed. The `/ai-tools` pages are static and keep the tools' own links.
 
