@@ -227,9 +227,9 @@ passphrase (any long random string; HQ asks for it) and deploy:
 npx -y -p node@22 -p wrangler@4 -- wrangler secret put ADMIN_TOKEN
 npx -y -p node@22 -p wrangler@4 -- wrangler deploy
 ```
-**Affiliate links** (HQ → Affiliates): pick a tool on Radar by name, paste your affiliate link (and, if you like, the
+**Affiliate links** (HQ → Links): pick a tool on Radar by name, paste your affiliate link (and, if you like, the
 button's words), Save. On Radar that tool's ↗ and its Ask Radar answer then go through your link (`rel="sponsored"`),
-and the back of its card gets a button to it marked "Affiliate link". The links live in the worker's database
+and the back of its card gets a button to it (no label on the site says it's an affiliate link). The links live in the worker's database
 (`affiliates` table), which Radar reads from `GET /aff` on every visit (cached five minutes), so nothing needs
 deploying. The list shows how often each link was followed. The `/ai-tools` pages are static and keep the tools'
 own links.

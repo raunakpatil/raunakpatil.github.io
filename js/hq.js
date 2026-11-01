@@ -140,7 +140,7 @@ function start() {
 // ---------- tabs & range ----------
 function route() {
   const t = location.hash.replace('#', '');
-  S.tab = ['overview', 'people', 'ronie', 'radar', 'work', 'affiliates'].includes(t) ? t : 'overview';
+  S.tab = ['overview', 'people', 'ronie', 'radar', 'work', 'links'].includes(t) ? t : 'overview';
   $$('#tabs a').forEach((a) => a.classList.toggle('active', a.dataset.tab === S.tab));
   $$('.view').forEach((v) => { v.hidden = v.dataset.view !== S.tab; });
   moveIndicator();
@@ -153,7 +153,7 @@ function moveIndicator() {
   ind.style.transform = `translateX(${a.offsetLeft}px)`;
 }
 addEventListener('hashchange', route);
-addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && S.tab !== 'affiliates' && render(), 200); });   // (the form keeps what's typed: a phone's keyboard resizes the page)
+addEventListener('resize', () => { moveIndicator(); clearTimeout(S.rz); S.rz = setTimeout(() => S.data && S.tab !== 'links' && render(), 200); });   // (the form keeps what's typed: a phone's keyboard resizes the page)
 document.fonts?.ready.then(moveIndicator);
 $$('#range button').forEach((b) => {
   b.setAttribute('aria-pressed', String(+b.dataset.days === S.days));
@@ -543,18 +543,18 @@ const loadTools = () => (toolList ||= Promise.all([
   ...(C.hf || []).map((r) => ({ key: `hf:${r[1]}`, name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, src: 'HF Space', pop: r[3] })),
 ]));
 const SRCNAME = { pick: 'Hand-picked', gh: 'GitHub', hf: 'HF Space', ph: 'Product Hunt' };
-VIEWS.affiliates = () => card('s12', 'link', 'Add an affiliate link', `<form class="aff-form" id="aff-form" autocomplete="off">
+VIEWS.links = () => card('s12', 'link', 'Add a link', `<form class="aff-form" id="aff-form" autocomplete="off">
     <label class="aff-f aff-tool"><span>Tool on Radar</span>
       <input class="search" id="aff-q" placeholder="Start typing a tool's name, e.g. Runway" required>
       <div class="aff-menu" id="aff-menu" hidden></div></label>
-    <label class="aff-f"><span>Your affiliate link</span><input class="search" id="aff-url" type="url" placeholder="https://runwayml.com/?ref=…" required></label>
+    <label class="aff-f"><span>Your link</span><input class="search" id="aff-url" type="url" placeholder="https://runwayml.com/?ref=…" required></label>
     <label class="aff-f aff-cta"><span>Button text <i>(optional)</i></span><input class="search" id="aff-cta" maxlength="40" placeholder="Try Runway"></label>
     <button class="go-dark" type="submit" id="aff-save">Save</button>
     <p class="aff-pick" id="aff-pick"></p>
   </form>
-  <p class="aff-help">On Radar, this tool's ↗ goes through your link, and the back of its card gets a button to it, marked “Affiliate link”. Live for visitors within about five minutes.</p>`)
-  + card('s12', 'out', 'Your affiliate links', '<div id="aff-list"><p class="empty">Loading…</p></div>', 'clicks are people following the link from Radar');
-AFTER.affiliates = async (v) => {
+  <p class="aff-help">On Radar, this tool's ↗ goes through your link, and the back of its card gets a button to it. Live for visitors within about five minutes.</p>`)
+  + card('s12', 'out', 'Your links', '<div id="aff-list"><p class="empty">Loading…</p></div>', 'clicks are people following the link from Radar');
+AFTER.links = async (v) => {
   let chosen = null;
   const q = $('#aff-q', v), menu = $('#aff-menu', v), pickEl = $('#aff-pick', v), list = $('#aff-list', v);
   const choose = (t) => {
@@ -577,7 +577,7 @@ AFTER.affiliates = async (v) => {
   document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.aff-tool')) menu.hidden = true; });
 
   const draw = (links) => {
-    list.innerHTML = !links.length ? empty('No affiliate links yet. Add one above.') : `<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Goes to</th><th>Button</th><th class="n">Clicks · 30d</th><th class="n">All time</th><th class="n">Card views · 30d</th><th></th></tr></thead><tbody>
+    list.innerHTML = !links.length ? empty('No links yet. Add one above.') : `<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Goes to</th><th>Button</th><th class="n">Clicks · 30d</th><th class="n">All time</th><th class="n">Card views · 30d</th><th></th></tr></thead><tbody>
       ${links.map((l, i) => `<tr data-i="${i}" style="cursor:default"><td><b style="font-weight:500">${esc(l.name || l.key.split(':').slice(1).join(':'))}</b><span class="sub">${esc(SRCNAME[l.key.split(':')[0]] || '')}</span></td>
         <td><a href="${esc(l.url)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(host(l.url))}</a><span class="sub mono" style="word-break:break-all">${esc(l.url.length > 70 ? `${l.url.slice(0, 70)}…` : l.url)}</span></td>
         <td>${esc(l.cta || `Try ${l.name || ''}`)}</td><td class="n">${fmt(l.clicks30)}</td><td class="n">${fmt(l.clicks)}</td><td class="n">${fmt(l.views30)}</td>
@@ -591,7 +591,7 @@ AFTER.affiliates = async (v) => {
     }));
     $$('[data-del]', list).forEach((b) => b.addEventListener('click', async () => {
       const l = links[+b.dataset.del];
-      if (!confirm(`Remove the affiliate link for ${l.name || l.key}? Its card goes back to its own page.`)) return;
+      if (!confirm(`Remove your link for ${l.name || l.key}? Its card goes back to its own page.`)) return;
       try { draw((await api('/admin/affiliates/delete', { method: 'POST', body: JSON.stringify({ key: l.key }) })).links); } catch (err) { alert(err.message); }
     }));
   };

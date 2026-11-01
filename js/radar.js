@@ -514,7 +514,7 @@ function renderDirectory(T, catalogP) {
     return `<span class="tool-back-head">${icon(t)}<span class="tool-back-kicker">${kicker}</span></span>
       <p class="tool-back-what"><span class="tl-skel-line"></span><span class="tl-skel-line short"></span></p>
       <dl>${rows.map(([k, v, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>${aff
-        ? `<span class="tool-back-go"><a class="tool-back-cta" href="${esc(aff.u)}" target="_blank" rel="sponsored noopener">${esc(aff.cta || `Try ${t.n}`)} <b>↗</b></a><small>Affiliate link</small></span>` : ''}`;
+        ? `<span class="tool-back-go"><a class="tool-back-cta" href="${esc(aff.u)}" target="_blank" rel="sponsored noopener">${esc(aff.cta || `Try ${t.n}`)} <b>↗</b></a></span>` : ''}`;
   };
   const curatedTop = curated.filter((t) => t.pick).map((t) => t.n);
   const card = (t, k) => {
