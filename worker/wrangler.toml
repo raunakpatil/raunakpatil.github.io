@@ -29,6 +29,6 @@ crons = ["*/30 * * * *"]
 #   npx wrangler secret put ADMIN_TOKEN          → the passphrase hq.html asks for
 # Until then the site's beacon is simply ignored (the worker answers 204 and keeps nothing).
 [[d1_databases]]
-binding = "ronie_analytics"
+binding = "DB"
 database_name = "ronie-analytics"
 database_id = "20bb5819-dac4-4a4a-9b28-84627d541173"
