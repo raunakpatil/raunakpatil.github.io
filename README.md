@@ -197,3 +197,36 @@ $k = Read-Host 'Gemini key' -AsSecureString; [Net.NetworkCredential]::new('', $k
 ### Address
 Ronie lives at **raunakpatil.com/ronie** (`ronie.html` hands visitors to the site, which keeps `/ronie` in the
 address bar); every other page is `/#page`.
+
+## Command centre (raunakpatil.com/hq)
+`hq.html` is a private dashboard of what visitors do on the site, in the site's own look. Five tabs: **Overview**
+(visitors, visits, time, traffic, who's on the site now, a dotted world map of cities, countries, sections, where they
+came from, devices, when they visit, the networks they visit from), **People** (everyone seen, named ones first: name,
+email and company if they gave them to Ronie, place, network, device, visits; click someone for their whole story,
+add notes, or forget them), **Ronie** (every conversation, word for word, topics, opening questions, and a briefing
+Ronie writes from the period's questions), **Radar** (searches, searches that found nothing, Ask Radar questions and
+what it picked, cards flipped, tools visited and saved, filters, headlines and models opened), **Work** (projects, case
+studies and certificates opened, links followed out, every button clicked). `hq.html?demo` shows made-up data.
+
+How it works: `js/track.js` (on every page, and on the `/ai-tools` pages) keeps a random visitor id in
+`localStorage` and sends small batches of events to Ronie's worker (`POST /t`); `/chat` logs each question and answer
+itself. The worker (`worker/src/analytics.js`) keeps them in a D1 database, adding the city, region, country and
+network Cloudflare reads from the visitor's IP address (the address itself is never stored), and skips bots. The
+dashboard reads it through `/admin/*`, which needs the `ADMIN_TOKEN` passphrase. Opening HQ once switches tracking off
+for that browser (`rp-notrack` in `localStorage`), and visitors with Do Not Track on aren't tracked.
+
+One-time setup, from `worker/` (Node 22, as for deploying Ronie):
+
+```
+npx -y -p node@22 -p wrangler@4 -- wrangler d1 create ronie-analytics
+```
+Paste the `database_id` it prints into `wrangler.toml` and uncomment the `[[d1_databases]]` lines there. Then set the
+passphrase (any long random string; HQ asks for it) and deploy:
+
+```
+npx -y -p node@22 -p wrangler@4 -- wrangler secret put ADMIN_TOKEN
+npx -y -p node@22 -p wrangler@4 -- wrangler deploy
+```
+The tables create themselves on the first event. Until the database exists the worker simply ignores the beacon.
+Since the site now records names, emails and approximate locations, the site should say so (a line in Ronie's
+first message or the footer, e.g. "This site keeps anonymous visit statistics and what you tell Ronie").

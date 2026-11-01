@@ -2,6 +2,7 @@
 // Workers AI (free daily allowance). It only knows what's in facts.js, which is generated from js/data.js.
 import { FACTS } from './facts.js';
 import { buildFeed } from './feed.js';
+import { collect, logChat, admin } from './analytics.js';
 
 const MODEL = '@cf/qwen/qwen3-30b-a3b-fp8';   // 30B mixture-of-experts, ~3B active: smart, but priced like a 3B model
 const ALLOWED = ['https://raunakpatil.com', 'https://www.raunakpatil.com', 'http://127.0.0.1:5173', 'http://localhost:5173'];
@@ -515,17 +516,73 @@ async function feed(env, ctx, cors) {
   return new Response(body, { headers });
 }
 
+// Ronie's answer to a question about Raunak
+async function chat(env, body, cors) {
+  const messages = (Array.isArray(body.messages) ? body.messages : [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+    .slice(-8)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 500) }));
+  if (!messages.length || messages[messages.length - 1].role !== 'user') return json({ error: 'bad request' }, 400, cors);
+
+  if (HIJACK.test(messages[messages.length - 1].content)) return json({ reply: nope(), face: 'smug', icon: 'shield', move: 'shake' }, 200, cors);
+
+  // the visitor's name (letters only, so it can't carry instructions) — Ronie uses it now and then
+  const name = String(body.name || '').replace(/[^\p{L}\p{M}' .-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 30);
+  const who = name
+    ? `\n\nThe visitor's name is ${name}. Use it naturally now and then (not in every reply).`
+    : '';
+
+  try {
+    const opts = { maxTokens: 180, temperature: 0.3, prefer: body.model };
+    const radar = await radarContext(env, messages[messages.length - 1].content).catch(() => '');
+    let reply = await generate(env, `${SYSTEM}${who}${radar}`, messages, opts);
+    reply = reply.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/\*\*?|__|#+ /g, '').trim();
+    // the face/icon tags: keep them only if they're on the lists, and never show them as text
+    const tag = (kind) => { const m = reply.match(new RegExp(`\\[\\s*${kind}\\s*:\\s*([a-z]+)\\s*\\]`, 'i')); return m ? m[1].toLowerCase() : null; };
+    let face = tag('face'), icon = tag('icon'), move = tag('move');
+    if (!FACE_TAGS.includes(face)) face = null;
+    if (!ICON_TAGS.includes(icon) || icon === 'none') icon = null;
+    if (!MOVE_TAGS.includes(move) || move === 'none') move = null;
+    // the tags, and any made-up ones like [link:his projects]
+    reply = reply.replace(/\[\s*[a-z]+\s*:[^\]]*\]/gi, '').replace(/\s+([.,!?])/g, '$1').trim();
+    // any "the links are below" line goes: the page adds its own when it shows buttons
+    reply = reply.split(/(?<=[.!?…])\s+/).filter((x) => !BELOW.test(x)).join(' ') || reply;
+    // the model forgetting it's Ronie (or quoting its setup) — not a mention of OpenAI as one of his tools
+    if (/\b(i am|i'm|as) (chatgpt|gemini|qwen|an? (ai|large language model|language model) (made|built|trained|developed|created) by)|system prompt|my instructions/i.test(reply)) { reply = nope(); face = 'smug'; icon = 'shield'; move = 'shake'; }
+    // a portfolio robot, not a coding assistant
+    if (/```|\bdef |function\s*\w*\s*\(|=>\s*\{/.test(reply)) { reply = OFFTOPIC[Math.floor(Math.random() * OFFTOPIC.length)]; face = 'nervous'; icon = 'sweat'; move = 'scratch'; }
+    reply = reply.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '').replace(/\s*\n+\s*/g, ' ').trim();
+    // stage directions like "(Awkwardly)" or "*whirrs*" — Ronie's asides in brackets that are actual speech stay
+    reply = reply.replace(/\(\s*\w+ly\s*\)\s*/g, '').replace(/\*[^*]{1,40}\*\s*/g, '').replace(/\s*\u2014\s*(?=[.,!?)])/g, '').replace(/\s*\u2014\s*/g, ', ').replace(/\s{2,}/g, ' ').trim();
+    if (!reply) return json({ error: 'empty' }, 502, cors);
+    return json({ reply, face, icon, move, model: opts.used }, 200, cors);
+  } catch (err) {
+    // most often: the free daily allowance is used up — the site falls back to Ronie's scripted answers
+    return json({ error: quotaGone(err) ? 'quota' : 'unavailable' }, 503, cors);
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get('Origin') || '';
     const cors = {
       'Access-Control-Allow-Origin': ALLOWED.includes(origin) ? origin : ALLOWED[0],
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
       Vary: 'Origin',
     };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
     const path = new URL(request.url).pathname;
+    // the site's analytics beacon (js/track.js), and the command centre's reads (hq.html) — see src/analytics.js
+    if (request.method === 'POST' && path === '/t') {
+      if (!ALLOWED.includes(origin)) return json({ error: 'forbidden' }, 403, cors);
+      return collect(request, env, ctx, cors, json);
+    }
+    if (path.startsWith('/admin/')) {
+      if (!ALLOWED.includes(origin)) return json({ error: 'forbidden' }, 403, cors);
+      return admin(request, env, ctx, cors, json, { generate });
+    }
     if (request.method === 'GET' && path === '/feed') return feed(env, ctx, cors);
     // the card backs already written, up to 100 at a time, for the site's weekly build of its tool pages
     // (scripts/build-seo-pages.mjs): read only, nothing is written here, so it needs no limit
@@ -558,49 +615,16 @@ export default {
 
     let body;
     try { body = await request.json(); } catch { return json({ error: 'bad request' }, 400, cors); }
-    if (body.mode === 'game') return game(env, body, cors);
-    const messages = (Array.isArray(body.messages) ? body.messages : [])
-      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-      .slice(-8)
-      .map((m) => ({ role: m.role, content: m.content.slice(0, 500) }));
-    if (!messages.length || messages[messages.length - 1].role !== 'user') return json({ error: 'bad request' }, 400, cors);
-
-    if (HIJACK.test(messages[messages.length - 1].content)) return json({ reply: nope(), face: 'smug', icon: 'shield', move: 'shake' }, 200, cors);
-
-    // the visitor's name (letters only, so it can't carry instructions) — Ronie uses it now and then
-    const name = String(body.name || '').replace(/[^\p{L}\p{M}' .-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 30);
-    const who = name
-      ? `\n\nThe visitor's name is ${name}. Use it naturally now and then (not in every reply).`
-      : '';
-
-    try {
-      const opts = { maxTokens: 180, temperature: 0.3, prefer: body.model };
-      const radar = await radarContext(env, messages[messages.length - 1].content).catch(() => '');
-      let reply = await generate(env, `${SYSTEM}${who}${radar}`, messages, opts);
-      reply = reply.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/\*\*?|__|#+ /g, '').trim();
-      // the face/icon tags: keep them only if they're on the lists, and never show them as text
-      const tag = (kind) => { const m = reply.match(new RegExp(`\\[\\s*${kind}\\s*:\\s*([a-z]+)\\s*\\]`, 'i')); return m ? m[1].toLowerCase() : null; };
-      let face = tag('face'), icon = tag('icon'), move = tag('move');
-      if (!FACE_TAGS.includes(face)) face = null;
-      if (!ICON_TAGS.includes(icon) || icon === 'none') icon = null;
-      if (!MOVE_TAGS.includes(move) || move === 'none') move = null;
-      // the tags, and any made-up ones like [link:his projects]
-      reply = reply.replace(/\[\s*[a-z]+\s*:[^\]]*\]/gi, '').replace(/\s+([.,!?])/g, '$1').trim();
-      // any "the links are below" line goes: the page adds its own when it shows buttons
-      reply = reply.split(/(?<=[.!?…])\s+/).filter((x) => !BELOW.test(x)).join(' ') || reply;
-      // the model forgetting it's Ronie (or quoting its setup) — not a mention of OpenAI as one of his tools
-      if (/\b(i am|i'm|as) (chatgpt|gemini|qwen|an? (ai|large language model|language model) (made|built|trained|developed|created) by)|system prompt|my instructions/i.test(reply)) { reply = nope(); face = 'smug'; icon = 'shield'; move = 'shake'; }
-      // a portfolio robot, not a coding assistant
-      if (/```|\bdef |function\s*\w*\s*\(|=>\s*\{/.test(reply)) { reply = OFFTOPIC[Math.floor(Math.random() * OFFTOPIC.length)]; face = 'nervous'; icon = 'sweat'; move = 'scratch'; }
-      reply = reply.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '').replace(/\s*\n+\s*/g, ' ').trim();
-      // stage directions like "(Awkwardly)" or "*whirrs*" — Ronie's asides in brackets that are actual speech stay
-      reply = reply.replace(/\(\s*\w+ly\s*\)\s*/g, '').replace(/\*[^*]{1,40}\*\s*/g, '').replace(/\s*\u2014\s*(?=[.,!?)])/g, '').replace(/\s*\u2014\s*/g, ', ').replace(/\s{2,}/g, ' ').trim();
-      if (!reply) return json({ error: 'empty' }, 502, cors);
-      return json({ reply, face, icon, move, model: opts.used }, 200, cors);
-    } catch (err) {
-      // most often: the free daily allowance is used up — the site falls back to Ronie's scripted answers
-      return json({ error: quotaGone(err) ? 'quota' : 'unavailable' }, 503, cors);
+    const res = await (body.mode === 'game' ? game(env, body, cors) : chat(env, body, cors));
+    // every question and answer goes in the command centre's log (src/analytics.js), once the visitor has theirs
+    if (env.DB) {
+      const msgs = Array.isArray(body.messages) ? body.messages : [];
+      const q = [...msgs].reverse().find((m) => m && m.role === 'user');
+      ctx.waitUntil(res.clone().json()
+        .then((j) => logChat(env, request, body, { mode: body.mode === 'game' ? 'game' : 'chat', q: q && q.content, reply: j.reply || `[${j.error || 'no reply'}]`, model: j.model }))
+        .catch((err) => console.error('logChat', err)));
     }
+    return res;
   },
   // every half hour (wrangler.toml): Radar's feed, fresh, and a few more card backs written ahead of time
   async scheduled(event, env, ctx) {
