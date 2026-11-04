@@ -29,7 +29,48 @@ const slug = (n) => n.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g
 const fmt = (n) => Number(n).toLocaleString('en-US');
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-const clip = (s, n) => (s.length <= n ? s : `${s.slice(0, n - 1).replace(/\s+\S*$/, '')}…`);
+// A search snippet: the whole text when it fits, otherwise the longest whole sentence that fits,
+// otherwise a word boundary. Source ellipses are closed into a sentence, never left as a cut-off "…".
+const sentence = (s, n = 160) => {
+  let t = String(s ?? '').replace(/\s+/g, ' ').replace(/,?\s*…+(?=\s|$)/g, '.').replace(/\s+/g, ' ').replace(/\.\s*\./g, '.').trim();
+  const dangling = /(?:\b(?:and|or|the|a|an|of|for|to|with|from|in|on|by|at|as|its|their|that|which|into|than)\s*)$/i;
+  const finish = (x) => {
+    let y = x.trim().replace(/[,:;]\s*$/, '').trim();
+    while (dangling.test(y)) y = y.replace(dangling, '').trim().replace(/[,:;]\s*$/, '').trim();
+    if (!y || /[.!?]$/.test(y)) return y;
+    return `${y}.`;
+  };
+  if (t.length <= n) {
+    const done = finish(t);
+    if (done.length <= n) return done;
+  }
+  // The longest run of whole sentences that fits.
+  let end = -1;
+  for (let i = 0; i < n && i < t.length; i++) {
+    if ('.!?'.includes(t[i]) && (i + 1 === t.length || /\s/.test(t[i + 1]))) end = i + 1;
+  }
+  if (end >= 80) return t.slice(0, end).trim();
+  // Otherwise the longest clause, so a short first sentence does not throw away the names that follow.
+  let clause = -1;
+  for (let i = 0; i < n && i < t.length; i++) if (',;:'.includes(t[i])) clause = i;
+  if (clause >= 80) return finish(t.slice(0, clause));
+  if (end >= 40) return t.slice(0, end).trim();
+  const cut = t.slice(0, n - 1).replace(/\s+\S*$/, '');
+  const done = finish(cut);
+  return done.length <= n ? done : done.slice(0, n).trim();
+};
+// Tool titles stay on the query ("<name> alternatives") and under the length Google shows.
+const toolTitle = (name) => {
+  const full = `${name}: what it is, price and alternatives | Radar`;
+  if (full.length <= 65) return full;
+  const alt = `${name} alternatives | Radar`;
+  if (alt.length <= 65) return alt;
+  const suffix = ' | Radar';
+  const room = 65 - suffix.length;
+  let cut = name.slice(0, room).replace(/[\s|:–—-]+[^\s|:–—-]*$/, '').replace(/[\s|:–—-]+$/, '');
+  if (cut.length < 12) cut = name.slice(0, room).trim();
+  return `${cut}${suffix}`;
+};
 const norm = (x) => x.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 // ---------- the tools, as Radar lists them ----------
@@ -119,6 +160,32 @@ const FROM = (t) => (t.mine ? 'Built by Raunak, listed among the other tools'
 const catLink = (c) => `/ai-tools/${CAT_PAGE[c].s}`;
 // (a category's name inside a sentence: lower case, but AI and 3D stay as they are)
 const lowH = (c) => CAT_PAGE[c].h.toLowerCase().replace(/\bai\b/g, 'AI').replace(/\b3d\b/g, '3D');
+// One complete, unique description per category. The names and the count come from the data, so it
+// stays current without a hand-written sentence per page, and it stays inside a search snippet.
+const categoryDesc = (c) => {
+  const picks = ranked[c].filter((t) => t.src === 'pick');
+  if (!picks.length) return `Best ${lowH(c)} in ${MONTH}, ranked with prices.`;
+  const names = picks.map((t) => t.n);
+  const total = catSize(c);
+  for (const k of [3, 2, 1]) {
+    const shown = names.slice(0, k);
+    const more = total - shown.length;
+    const line = `Best ${lowH(c)} in ${MONTH}: ${shown.join(', ')}${more > 0 ? ` and ${fmt(more)} more` : ''}, ranked with prices.`;
+    if (line.length <= 160) return line;
+  }
+  return sentence(`Best ${lowH(c)} in ${MONTH}, ranked with prices.`);
+};
+// One sentence that names the tool and a few alternatives, shortened until it fits a snippet.
+const altDesc = (t, alts) => {
+  const kind = lowH(t.c);
+  for (const k of [4, 3, 2, 1]) {
+    const shown = alts.slice(0, k).map((x) => x.n);
+    if (!shown.length) break;
+    const line = `${t.n} alternatives in ${MONTH}: ${shown.join(', ')} and more ${kind}, compared by what they do and what they cost.`;
+    if (line.length <= 160) return line;
+  }
+  return sentence(`${t.n} alternatives in ${MONTH}: other ${kind}, compared by what they do and what they cost.`);
+};
 
 // ---------- the page around the content: the site's own top bar and title, Radar's views and search bar, and its
 // tool cards (css/style.css, the same file the site uses; css/pages.css adds the little these pages need). Whatever a
@@ -202,6 +269,9 @@ const pages = [];
 function page({ path, title, desc, body, ld = [], trail, prio = 0.6 }) {
   const c = crumbs(trail);
   const graph = { '@context': 'https://schema.org', '@graph': [c.ld, ...ld] };
+  const description = sentence(desc);
+  const image = `${SITE}/img/radar-og.png`;
+  const imageAlt = 'Radar: the best AI tools on the radar';
   const html = `<!doctype html>
 <!-- Generated by scripts/build-seo-pages.mjs from Radar's data, edit that script or the data, then run it again. -->
 <html lang="en">
@@ -209,15 +279,22 @@ function page({ path, title, desc, body, ld = [], trail, prio = 0.6 }) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(title)}</title>
-  <meta name="description" content="${esc(clip(desc, 158))}">
+  <meta name="description" content="${esc(description)}">
   <link rel="canonical" href="${SITE}${path}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Radar · Raunak Patil">
   <meta property="og:title" content="${esc(title)}">
-  <meta property="og:description" content="${esc(clip(desc, 200))}">
+  <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${SITE}${path}">
-  <meta property="og:image" content="${SITE}/img/radar-og.png">
+  <meta property="og:image" content="${image}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${imageAlt}">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${esc(title)}">
+  <meta name="twitter:description" content="${esc(description)}">
+  <meta name="twitter:image" content="${image}">
+  <meta name="twitter:image:alt" content="${imageAlt}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -282,6 +359,8 @@ const count = (html) => `<p class="tl-count">${html}</p>`;
 const HUB = ['Radar', '/radar'], AT = ['AI tools', '/ai-tools/'];
 
 // ---------- category pages ----------
+const catTitles = new Set();
+const catDescs = new Set();
 for (const c of Object.keys(CATS)) {
   const P = CAT_PAGE[c], list1 = ranked[c].filter((t) => t.src === 'pick');
   const extra = (s) => ranked[c].filter((t) => t.src === s).slice(0, 8);
@@ -290,10 +369,17 @@ for (const c of Object.keys(CATS)) {
     ['hf', 'To try in the browser', 'on Hugging Face Spaces, by likes'],
     ['ph', 'Launched on Product Hunt', 'by upvotes'],
   ].filter(([s]) => extra(s).length);
+  const title = `Best ${P.h} in ${YEAR}, ranked | Radar`;
+  const desc = categoryDesc(c);
+  if (catTitles.has(title)) throw new Error(`duplicate category title: ${title}`);
+  if (catDescs.has(desc)) throw new Error(`duplicate category description: ${desc}`);
+  if (desc.length > 160 || desc.length < 40 || !/[.!?]$/.test(desc) || desc.includes('…')) throw new Error(`bad category description for ${c} (${desc.length}): ${desc}`);
+  catTitles.add(title);
+  catDescs.add(desc);
   page({
     path: catLink(c),
-    title: `Best ${P.h} in ${YEAR}, ranked | Radar`,
-    desc: `The best ${lowH(c)} in ${MONTH}: ${list1.slice(0, 4).map((t) => t.n).join(', ')} and more, ranked, with prices. ${P.intro}`,
+    title,
+    desc,
     trail: [HUB, AT, [P.h, catLink(c)]],
     prio: 0.9,
     ld: [itemList(`Best ${P.h}`, list1)],
@@ -385,7 +471,7 @@ for (const t of top.filter((x) => !x.mine)) {
   page({
     path,
     title: `Best ${t.n} alternatives in ${YEAR} (${alts.length} compared) | Radar`,
-    desc: `Looking for something other than ${t.n}? ${alts.slice(0, 4).map((x) => x.n).join(', ')} and more ${lowH(t.c)}, compared by what they do and what they cost.`,
+    desc: altDesc(t, alts),
     trail: [HUB, AT, [CAT_PAGE[t.c].h, catLink(t.c)], [`${t.n} alternatives`, path]],
     prio: 0.8,
     ld: [itemList(`${t.n} alternatives`, alts)],
@@ -431,10 +517,12 @@ function toolPages() {
     ].filter(Boolean);
     const alt = altOf.get(t);
     const ld = { '@type': 'SoftwareApplication', name: t.n, description: plain || t.d, applicationCategory: APP_CAT[t.c] || 'Application', url: t.u, ...(['free', 'open'].includes(t.p) ? { offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' } } : {}) };
+    const about = (plain || t.d).trim();
+    const named = about.toLowerCase().startsWith(t.n.toLowerCase()) ? about : `${t.n}: ${about}`;
     page({
       path: t.page,
-      title: `${t.n}: what it is, price and alternatives | Radar`,
-      desc: `${plain || t.d} ${PRICE_LONG[t.p] || ''}. Similar: ${like.slice(0, 3).map((x) => x.n).join(', ')}.`,
+      title: toolTitle(t.n),
+      desc: `${named} ${PRICE_LONG[t.p] || ''}. Similar: ${like.slice(0, 3).map((x) => x.n).join(', ')}.`.replace(/\s+/g, ' ').trim(),
       trail: [HUB, AT, [CAT_PAGE[t.c].h, catLink(t.c)], [t.n, t.page]],
       prio: t.src === 'pick' ? 0.7 : 0.5,
       ld: [ld],
@@ -469,7 +557,7 @@ function hub() {
   page({
     path: '/ai-tools/',
     title: `Best AI Tools on the Radar: ${fmt(all.length)} AI tools, ranked and updated weekly`,
-    desc: `The best AI tools by category, the Top 50, new releases, free and open-source tools: ${fmt(all.length)} AI tools hand-picked or gathered from GitHub, Hugging Face and Product Hunt, updated every week.`,
+    desc: `${fmt(all.length)} AI tools by category, plus the Top 50, new releases, and free and open-source picks. Updated every week.`,
     trail: [HUB, AT],
     prio: 1,
     ld: [{ '@type': 'CollectionPage', name: 'Best AI Tools on the Radar', url: `${SITE}/ai-tools/` }],
@@ -518,13 +606,23 @@ writeFileSync(at('ai-tools/radar.json'), `${JSON.stringify({
   free: freeCur.map(pub),
   pages: { hub: `${SITE}/ai-tools/`, top50: `${SITE}/ai-tools/top-50`, new: `${SITE}/ai-tools/new-ai-tools`, free: `${SITE}/ai-tools/free-ai-tools`, openSource: `${SITE}/ai-tools/open-source-ai-tools`, alternatives: Object.fromEntries([...altOf].map(([t, p]) => [t.n, SITE + p])) },
 })}\n`);
-// the sitemap: the site's own pages, then all of these
+// the sitemap: the site's own pages, then all of these. One file: 6,000 tools do not each have a page
+// (only the hand-picked ones and the catalogue names people search for), so this stays far under
+// the 50,000 URL and 50MB limits and does not need a sitemap index.
 const own = [['/', 1.0, 'weekly'], ['/radar', 0.9, 'daily'], ['/ronie', 0.6, 'monthly']];
-writeFileSync(at('sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${own.map(([u, p, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${TODAY}</lastmod><changefreq>${f}</changefreq><priority>${p.toFixed(1)}</priority></url>`).join('\n')}
 ${pages.map((p) => `  <url><loc>${SITE}${p.path}</loc><lastmod>${TODAY}</lastmod><priority>${p.prio.toFixed(1)}</priority></url>`).join('\n')}
 </urlset>
-`);
+`;
+const urlCount = pages.length + own.length;
+if (urlCount > 50000) throw new Error(`sitemap has ${urlCount} URLs, over the 50,000 limit; split it into a sitemap index`);
+if (Buffer.byteLength(sitemap) > 50 * 1024 * 1024) throw new Error('sitemap is over 50MB; split it into a sitemap index');
+if (!/^\d{4}-\d{2}-\d{2}$/.test(TODAY)) throw new Error(`sitemap lastmod is not a date: ${TODAY}`);
+const listed = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]));
+for (const p of pages) if (!listed.has(SITE + p.path)) throw new Error(`sitemap missing ${p.path}`);
+for (const [u] of own) if (!listed.has(SITE + u)) throw new Error(`sitemap missing ${u}`);
+writeFileSync(at('sitemap.xml'), sitemap);
 const n = (re) => pages.filter((p) => re.test(p.path)).length;
 console.log(`ai-tools: ${pages.length} pages (${n(/\/tool\//)} tools, ${n(/\/alternatives\//)} alternatives, ${Object.keys(CATS).length} categories, 4 collections, the hub); ${Object.keys(kept).length} plain-words lines; sitemap.xml: ${pages.length + own.length} addresses`);

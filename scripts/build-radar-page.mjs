@@ -16,7 +16,8 @@ const total = tools.tools.length + (catalog.gh?.length || 0) + (catalog.hf?.leng
 const count = `${Math.floor(total / 100) * 100}+`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const TITLE = `Best AI Tools on the Radar: ${count} AI tools, AI news and trending models`;
-const DESC = `Find the right AI tool: ${count} AI tools ranked by category, a Top 50, new releases, plus the latest AI news and the open models trending this week. Ask Radar in plain words. Updated weekly.`;
+const DESC = `Find an AI tool among ${count} ranked by category, with a Top 50, new releases and this week's AI news. Ask Radar in plain words.`;
+if (DESC.length > 160) throw new Error(`radar description is ${DESC.length} characters`);
 const swap = (s, re, to) => { if (!re.test(s)) throw new Error(`radar page: not found ${re}`); return s.replace(re, to); };
 let page = html;
 page = swap(page, /<title>[^<]*<\/title>/, `<title>${esc(TITLE)}</title>`);
@@ -27,6 +28,11 @@ page = swap(page, /<meta property="og:url" content="[^"]*">/, '<meta property="o
 page = swap(page, /<link rel="canonical" href="[^"]*">/, '<link rel="canonical" href="https://raunakpatil.com/radar">');
 page = swap(page, /<meta property="og:image" content="[^"]*">/, '<meta property="og:image" content="https://raunakpatil.com/img/radar-og.png">');
 page = swap(page, /<meta property="og:image:alt" content="[^"]*">/, '<meta property="og:image:alt" content="Radar: the best AI tools on the radar">');
+page = swap(page, /<meta name="twitter:card" content="summary_large_image">/, `<meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${esc(TITLE)}">
+  <meta name="twitter:description" content="${esc(DESC)}">
+  <meta name="twitter:image" content="https://raunakpatil.com/img/radar-og.png">
+  <meta name="twitter:image:alt" content="Radar: the best AI tools on the radar">`);
 // (what the page is, for search engines: a collection of AI tools that can be searched)
 const LD = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Radar', alternateName: 'Best AI Tools on the Radar', url: 'https://raunakpatil.com/radar', description: DESC, potentialAction: { '@type': 'SearchAction', target: 'https://raunakpatil.com/radar?q={q}', 'query-input': 'required name=q' } };
 page = swap(page, /<\/head>/, `  <script type="application/ld+json">${JSON.stringify(LD)}</script>\n</head>`);
