@@ -60,7 +60,9 @@ AI news, trending open models and a directory of AI tools. `radar.html` sends vi
   (150+ votes, with its price label — this part needs a Product Hunt developer token saved as the `PRODUCTHUNT_TOKEN`
   repository secret), in their makers' own words, with a category guessed from them (`scripts/build-catalog.mjs`).
   Each is listed once: nothing already hand-picked, no two with the same name or description (the most popular
-  stays), no copied Spaces, and no lists, courses or templates. Each entry ends with two dates: the day it joined
+  stays), no copied Spaces, and no lists, courses or templates. `data/excluded-tools.json` is a do-not-publish list
+  (name, slug, or domain): the refresh and the page build both drop a match, so a removed tool is not added back
+  from GitHub, Hugging Face or Product Hunt. Hedra is on that list. Each entry ends with two dates: the day it joined
   Radar, and the day it was released (the project or Space created, the product launched), which drives **New
   releases** (the last 90 days). The **Refresh Radar** GitHub Action rebuilds it on Mondays and Thursdays and commits
   it — so pull before pushing.

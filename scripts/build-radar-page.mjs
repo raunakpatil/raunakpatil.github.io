@@ -4,12 +4,18 @@
 // index.html changes, before deploying — the Refresh Radar Action runs it too, to keep the list current:
 //   node scripts/build-radar-page.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
+import { isExcluded } from './excluded-tools.mjs';
 
 const at = (p) => new URL(`../${p}`, import.meta.url);
 const html = readFileSync(at('index.html'), 'utf8');
 const tools = JSON.parse(readFileSync(at('data/tools.json'), 'utf8'));
 const feed = (() => { try { return JSON.parse(readFileSync(at('data/feed.json'), 'utf8')); } catch { return { news: [] }; } })();
 const catalog = (() => { try { return JSON.parse(readFileSync(at('data/catalog.json'), 'utf8')); } catch { return { gh: [], hf: [], ph: [] }; } })();
+// the same exclusion as the page build, so a listed tool in data/excluded-tools.json never reaches /radar's index
+tools.tools = tools.tools.filter((t) => !isExcluded({ name: t.n, url: t.u }));
+catalog.gh = (catalog.gh || []).filter((r) => !isExcluded({ name: r[0], url: `https://github.com/${r[1]}`, slug: String(r[1] || '').split('/').pop(), text: r[2] }));
+catalog.hf = (catalog.hf || []).filter((r) => !isExcluded({ name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, slug: String(r[1] || '').split('/').pop(), text: r[2] }));
+catalog.ph = (catalog.ph || []).filter((r) => !isExcluded({ name: r[0], url: r[7], slug: r[1], text: r[2] }));
 const slug = (n) => n.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'tool';   // (as scripts/build-seo-pages.mjs names the tool pages)
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const total = tools.tools.length + (catalog.gh?.length || 0) + (catalog.hf?.length || 0) + (catalog.ph?.length || 0);

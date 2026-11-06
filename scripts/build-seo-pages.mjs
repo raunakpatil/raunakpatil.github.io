@@ -9,11 +9,17 @@
 // after each refresh; run it by hand after editing data/tools.json:  node scripts/build-seo-pages.mjs
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import vm from 'node:vm';
+import { isExcluded } from './excluded-tools.mjs';
 
 const at = (p) => new URL(`../${p}`, import.meta.url);
 const read = (p, d) => { try { return JSON.parse(readFileSync(at(p), 'utf8')); } catch { return d; } };
 const T = read('data/tools.json');
 const C = read('data/catalog.json', { gh: [], hf: [], ph: [] });
+// data/excluded-tools.json: taken down, and kept out of the weekly catalogue refresh too
+T.tools = (T.tools || []).filter((t) => !isExcluded({ name: t.n, url: t.u }));
+C.gh = (C.gh || []).filter((r) => !isExcluded({ name: r[0], url: `https://github.com/${r[1]}`, slug: String(r[1] || '').split('/').pop(), text: r[2] }));
+C.hf = (C.hf || []).filter((r) => !isExcluded({ name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, slug: String(r[1] || '').split('/').pop(), text: r[2] }));
+C.ph = (C.ph || []).filter((r) => !isExcluded({ name: r[0], url: r[7], slug: r[1], text: r[2] }));
 const SITE = 'https://raunakpatil.com';
 const WORKER = 'https://ronie-chat.ronie-chat.workers.dev';
 const NOW = new Date();

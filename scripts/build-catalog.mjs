@@ -9,6 +9,7 @@
 //   node scripts/build-catalog.mjs     (GITHUB_TOKEN in the environment, or a logged-in `gh`, for GitHub)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
+import { isExcluded } from './excluded-tools.mjs';
 
 const TOKEN = process.env.GITHUB_TOKEN || (() => { try { return execSync('gh auth token', { encoding: 'utf8' }).trim(); } catch { return ''; } })();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -77,6 +78,7 @@ async function github() {
     const text = `${r.name} ${r.description || ''} ${(r.topics || []).join(' ')}`;
     if (!r.description || SKIP.test(text) || notTool(r.name, r.description)) continue;
     const name = r.name.replace(/[-_]+/g, (m) => (m === '_' ? ' ' : '-'));
+    if (isExcluded({ name, url: r.homepage || '', slug: r.name, text: `${r.description || ''} ${r.homepage || ''}` })) continue;
     out.push([name, r.full_name, tidy(r.description), r.stargazers_count, catOf(`${r.name} ${r.description}`, (r.topics || []).join(' '), 'build'), r.owner.id, (r.created_at || '').slice(0, 10)]);
   }
   return out.sort((a, b) => b[3] - a[3]);
@@ -99,6 +101,7 @@ async function spaces(max = 4500) {
       const desc = tidy(c.short_description || '');
       const text = `${s.id} ${title} ${desc} ${(c.tags || []).join(' ')} ${(s.tags || []).join(' ')} ${(c.models || []).join(' ')}`;
       if (s.runtime?.stage !== 'RUNNING' || !desc || (s.likes || 0) < 40 || c.duplicated_from || SKIP.test(text) || notTool(title, desc)) continue;
+      if (isExcluded({ name: title, url: `https://huggingface.co/spaces/${s.id}`, slug: s.id.split('/').pop(), text: `${s.id} ${title} ${desc}` })) continue;
       out.push([title, s.id, desc, s.likes, catOf(`${s.id} ${title} ${desc}`, text, 'build'), c.emoji || '🤗', COLORS.includes(c.colorFrom) ? c.colorFrom : 'gray', COLORS.includes(c.colorTo) ? c.colorTo : 'gray', (s.createdAt || '').slice(0, 10)]);
     }
     process.stdout.write(`\rHugging Face: ${out.length} spaces kept of ${seen}        `);
@@ -145,6 +148,7 @@ async function producthunt() {
     for (const { node: p } of d.posts.edges) {
       const tags = p.topics.edges.map((e) => e.node.slug).join(' ');
       if (!p.tagline || p.votesCount < 150 || SKIP.test(`${p.name} ${p.tagline} ${tags}`) || notTool(p.name, p.tagline)) continue;
+      if (isExcluded({ name: p.name, url: p.website || '', slug: p.slug, text: `${p.tagline} ${p.website || ''}` })) continue;
       out.push([tidy(p.name, 60), p.slug, tidy(p.tagline), p.votesCount, catOf(`${p.name} ${p.tagline}`, tags.replace(/-/g, ' '), 'work'),
         p.thumbnail?.url || '', PH_PRICE(p.pricingType), p.website || `https://www.producthunt.com/posts/${p.slug}`, (p.createdAt || '').slice(0, 10)]);
     }
@@ -210,9 +214,11 @@ const [hfAll, ghAll] = [await spaces(), await github()];
 // (without a token, the last list is kept — brought back to the shape the fetch gives: released last)
 const phAll = PH_TOKEN ? await producthunt() : (console.log('Product Hunt: no PRODUCTHUNT_TOKEN — keeping the last list'),
   (prev?.ph || []).map((r) => [...r.slice(0, 8), prev.v === 2 ? r[9] || r[8] : r[8]]));
-const repos = ghAll.filter((r) => once(`https://github.com/${r[1]}`, r[0], r[2])).map((r) => entry('gh', r, 6));
-const hf = hfAll.filter((r) => once(`https://huggingface.co/spaces/${r[1]}`, r[0], r[2])).map((r) => entry('hf', r, 8));
-const ph = phAll.filter((r) => once(r[7], r[0], r[2])).map((r) => entry('ph', r, 8));
+// (a second pass: a name, slug or blocked domain kept from an earlier run, or one the fetch above missed)
+const allowed = (r, url, slug) => !isExcluded({ name: r[0], url, slug, text: r[2] });
+const repos = ghAll.filter((r) => allowed(r, `https://github.com/${r[1]}`, String(r[1]).split('/').pop()) && once(`https://github.com/${r[1]}`, r[0], r[2])).map((r) => entry('gh', r, 6));
+const hf = hfAll.filter((r) => allowed(r, `https://huggingface.co/spaces/${r[1]}`, String(r[1]).split('/').pop()) && once(`https://huggingface.co/spaces/${r[1]}`, r[0], r[2])).map((r) => entry('hf', r, 8));
+const ph = phAll.filter((r) => allowed(r, r[7], r[1]) && once(r[7], r[0], r[2])).map((r) => entry('ph', r, 8));
 const added = [...keep].filter((k) => state.joined[k] === today).length;
 for (const k of Object.keys(state.joined)) if (!keep.has(k)) delete state.joined[k];
 for (const k of Object.keys(state.pop)) if (!keep.has(k)) delete state.pop[k];
