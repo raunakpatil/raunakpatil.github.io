@@ -6,6 +6,8 @@
 //    Hugging Face Spaces, rebuilt every week by scripts/build-catalog.mjs.
 // main.js loads this once the page is headed for (or opened), and calls open() each time it's shown.
 
+import { excludedChecker } from './excluded-tools.js';
+
 const D = window.PORTFOLIO;
 const V = new URL(import.meta.url).searchParams.get('v') || '';
 const $ = (s, r = document) => r.querySelector(s);
@@ -42,6 +44,8 @@ async function getFeed() {
   return { ...(await r.json()), live: false };
 }
 const tools = fetch(`data/tools.json${V ? `?v=${V}` : ''}`).then((r) => r.json());
+// names, slugs and domains that must not be listed (data/excluded-tools.json), even if a data file still has them
+const excluded = fetch(`data/excluded-tools.json${V ? `?v=${V}` : ''}`).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
 // the long list (data/catalog.json, scripts/build-catalog.mjs, refreshed weekly) — fetched alongside, shown when in
 let startCatalog;
 const catalog = new Promise((done) => { startCatalog = () => done(fetch(`data/catalog.json${V ? `?v=${V}` : ''}`).then((r) => (r.ok ? r.json() : null)).catch(() => null)); });
@@ -288,7 +292,7 @@ function dropdown(host, { key, label, options, value, onPick }) {
   };
 }
 
-function renderDirectory(T, catalogP) {
+function renderDirectory(T, catalogP, blocked = () => false) {
   const S = { view: 'all', q: '', src: 'all', price: 'all', cat: 'all', sort: 'picks', limit: 24 };
   const NEW_DAYS = 90;
   const STEP = 48;
@@ -303,7 +307,7 @@ function renderDirectory(T, catalogP) {
   if (window.ResizeObserver) new ResizeObserver(hint).observe(search);
   const keyOf = (t) => `${t.n} ${t.d} ${T.categories[t.c]} ${PRICES[t.p] || ''} ${t.uses || ''} ${t.by || ''}`.toLowerCase();
 
-  const curated = T.tools.map((t, i) => ({ ...t, src: 'pick', i }));
+  const curated = T.tools.filter((t) => !blocked({ name: t.n, url: t.u })).map((t, i) => ({ ...t, src: 'pick', i }));
   let rising = new Set();
   // saved tools: kept in this browser only
   const SAVE_KEY = 'radar-saved';
@@ -318,6 +322,7 @@ function renderDirectory(T, catalogP) {
     const norm = (x) => x.toLowerCase().replace(/[^a-z0-9]+/g, '');
     const known = new Set(curated.flatMap((t) => [norm(t.n), t.u.replace(/\/$/, '').toLowerCase()]));
     const take = (list, make) => list.map(make).filter((t) => {
+      if (blocked({ name: t.n, url: t.u, slug: t.slug, text: t.d })) return false;
       const k = norm(t.n), u = t.u.toLowerCase();
       if (known.has(k) || known.has(u)) return false;
       known.add(k); known.add(u);
@@ -928,7 +933,7 @@ function initAsk({ all, keyFor, linkOf, icon, esc: e, cats, prices, loaded, show
 
 /* ---------- wiring ---------- */
 const ready = Promise.all([
-  tools.then((T) => { renderDirectory(T, catalog); idle(startCatalog); }).catch((e) => { console.error('Tools list failed', e); $('#tl-grid').innerHTML = '<p class="tl-empty">The tools list didn\'t load. Refresh to try again.</p>'; }),
+  Promise.all([tools, excluded]).then(([T, ex]) => { renderDirectory(T, catalog, excludedChecker(ex)); idle(startCatalog); }).catch((e) => { console.error('Tools list failed', e); $('#tl-grid').innerHTML = '<p class="tl-empty">The tools list didn\'t load. Refresh to try again.</p>'; }),
   feed.then(renderNews),
 ]);
 const leadBox = $('#tl-lead');

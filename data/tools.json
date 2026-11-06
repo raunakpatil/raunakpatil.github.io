@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-17",
+  "updated": "2026-11-06",
   "categories": {
     "chat": "Chat & Assistants",
     "research": "Research & Search",
@@ -246,7 +246,6 @@
     { "n": "Captions", "u": "https://www.captions.ai", "c": "video", "p": "freemium", "d": "Talking-to-camera videos, edited and captioned by AI on your phone." },
     { "n": "Submagic", "u": "https://www.submagic.co", "c": "video", "p": "paid", "d": "Eye-catching captions, B-roll and zooms for short-form videos." },
     { "n": "Vizard", "u": "https://vizard.ai", "c": "video", "p": "freemium", "d": "Cuts long videos into short social clips, with captions." },
-    { "n": "Hedra", "u": "https://www.hedra.com", "c": "video", "p": "freemium", "d": "Expressive talking characters from a picture and a voice." },
     { "n": "D-ID", "u": "https://www.d-id.com", "c": "video", "p": "freemium", "d": "Talking-head videos and interactive avatars from a photo." },
     { "n": "Colossyan", "u": "https://www.colossyan.com", "c": "video", "p": "paid", "d": "Training videos with AI presenters, made for workplace learning." },
     { "n": "Tavus", "u": "https://www.tavus.io", "c": "video", "p": "paid", "d": "Lifelike video avatars that hold real-time conversations." },

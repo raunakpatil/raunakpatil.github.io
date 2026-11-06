@@ -1,6 +1,8 @@
 // HQ, Raunak's command centre (hq.html): reads the site's own analytics from Ronie's worker (GET /admin/stats etc.,
 // worker/src/analytics.js) with the ADMIN_TOKEN passphrase, and draws them in the site's look.
 // hq.html?demo shows made-up visitors, for a look before the database is set up.
+import { excludedChecker } from './excluded-tools.js';
+
 const API = 'https://ronie-chat.ronie-chat.workers.dev';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -538,14 +540,16 @@ let toolList = null;
 const loadTools = () => (toolList ||= Promise.all([
   fetch('data/tools.json').then((r) => r.json()).catch(() => ({ tools: [], categories: {} })),
   fetch('data/catalog.json').then((r) => r.json()).catch(() => ({})),
-]).then(([T, C]) => {
+  fetch('data/excluded-tools.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+]).then(([T, C, ex]) => {
   const cat = (c) => (T.categories || {})[c] || '';
+  const blocked = excludedChecker(ex);
   return [
     ...T.tools.map((t, i) => ({ key: `pick:${t.n}`, name: t.n, url: t.u, src: 'Hand-picked', group: 'pick', top: !!t.pick, cat: cat(t.c), price: t.p, pop: 1e9 - i, d: t.d })),
-    ...(C.ph || []).map((r) => ({ key: `ph:${r[1]}`, name: r[0], url: r[7], src: 'Product Hunt', group: 'ph', cat: cat(r[4]), price: r[6], pop: r[3], d: r[2] })),
-    ...(C.gh || []).map((r) => ({ key: `gh:${r[1]}`, name: r[0], url: `https://github.com/${r[1]}`, src: 'GitHub', group: 'gh', cat: cat(r[4]), price: 'open', pop: r[3], d: r[2] })),
-    ...(C.hf || []).map((r) => ({ key: `hf:${r[1]}`, name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, src: 'HF Space', group: 'hf', cat: cat(r[4]), price: 'free', pop: r[3], d: r[2] })),
-  ];
+    ...(C.ph || []).map((r) => ({ key: `ph:${r[1]}`, name: r[0], url: r[7], slug: r[1], src: 'Product Hunt', group: 'ph', cat: cat(r[4]), price: r[6], pop: r[3], d: r[2] })),
+    ...(C.gh || []).map((r) => ({ key: `gh:${r[1]}`, name: r[0], url: `https://github.com/${r[1]}`, slug: String(r[1] || '').split('/').pop(), src: 'GitHub', group: 'gh', cat: cat(r[4]), price: 'open', pop: r[3], d: r[2] })),
+    ...(C.hf || []).map((r) => ({ key: `hf:${r[1]}`, name: r[0], url: `https://huggingface.co/spaces/${r[1]}`, slug: String(r[1] || '').split('/').pop(), src: 'HF Space', group: 'hf', cat: cat(r[4]), price: 'free', pop: r[3], d: r[2] })),
+  ].filter((t) => !blocked({ name: t.name, url: t.url, slug: t.slug, text: t.d }));
 }));
 const SRCNAME = { pick: 'Hand-picked', gh: 'GitHub', hf: 'HF Space', ph: 'Product Hunt' };
 const programSearch = (name, url) => `https://www.google.com/search?q=${encodeURIComponent(`${name} ${host(url) && !/github\.com|huggingface\.co|producthunt\.com/.test(host(url)) ? `${host(url)} ` : ''}affiliate program`)}`;

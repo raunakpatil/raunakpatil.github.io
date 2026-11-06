@@ -1,0 +1,7 @@
+{
+  "note": "Tools that must not be published on Radar. scripts/build-catalog.mjs drops matches while gathering GitHub, Hugging Face and Product Hunt; scripts/build-seo-pages.mjs and scripts/build-radar-page.mjs drop them again when writing pages; js/radar.js and js/hq.js hide them if they are still in a data file. Hedra was removed after a trademark request from its founder (the page, the name, hedra.com links, and the logo).",
+  "names": ["Hedra"],
+  "namePattern": "\\bhedra\\b",
+  "domains": ["hedra.com"],
+  "slugs": ["hedra"]
+}
