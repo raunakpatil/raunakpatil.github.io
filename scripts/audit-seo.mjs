@@ -4,6 +4,7 @@
 //   node scripts/audit-seo.mjs --schema     also ask validator.schema.org about one page of each kind
 // Exits 1 when a check fails. Prints a Pass/Fail line per check.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { join, relative } from 'node:path';
 
 const ROOT = new URL('../', import.meta.url);
@@ -195,6 +196,60 @@ if (schema) {
     console.log(`  schema.org ${name}: ${errors} errors, ${data.totalNumWarnings || 0} warnings`);
   }
   note(schemaFail === 0, 'JSON-LD validates against schema.org', `${samples.length} sample pages`);
+}
+
+if (!live) {
+  const lists = ['/ai-tools/top-50', '/ai-tools/new-ai-tools', '/ai-tools/free-ai-tools', '/ai-tools/open-source-ai-tools'];
+  const listFiles = new Set(lists.map((href) => `${href.slice(1)}.html`));
+  const listPages = pages.filter((p) => listFiles.has(p.file) || /best-ai-/.test(p.file) || p.file.includes('/tool/') || p.file.includes('/alternatives/'));
+  let missingListLink = 0;
+  for (const p of listPages) for (const href of lists) if (!p.html.includes(`href="${href}"`)) missingListLink++;
+  note(listPages.length > 1000 && missingListLink === 0, 'category, tool, alternatives and collection pages link the four lists', missingListLink ? `${missingListLink} missing links across ${listPages.length} pages` : `${listPages.length} pages`);
+
+  const byFile = new Map(pages.map((p) => [p.file, p.html]));
+  let orphanTools = 0;
+  let factsMissing = 0;
+  for (const p of pages) {
+    if (!p.file.startsWith('ai-tools/best-ai-')) continue;
+    if (!p.html.includes('Radar lists ')) factsMissing++;
+  }
+  for (const p of pages.filter((x) => x.file.includes('/tool/'))) {
+    const cat = (p.html.match(/<dt>Category<\/dt><dd><a href="([^"]+)">/) || [])[1];
+    const self = (p.html.match(/<link rel="canonical" href="https:\/\/raunakpatil\.com(\/ai-tools\/tool\/[^"]+)"/) || [])[1];
+    const catFile = cat ? `ai-tools${cat.slice('/ai-tools'.length)}.html` : '';
+    const catHtml = byFile.get(catFile) || '';
+    if (!self || !catHtml.includes(`href="${self}"`)) orphanTools++;
+  }
+  note(factsMissing === 0 && kinds.category.length === 12, 'each category page states how its list breaks down', factsMissing ? `${factsMissing} missing the catalogue counts` : '12 pages');
+  note(orphanTools === 0, 'every tool page is linked from its category page', orphanTools ? `${orphanTools} tool pages have no category link` : `${kinds.tool.length} tool pages`);
+
+  const smDate = new Map([...sitemap.matchAll(/<loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod>/g)].map((m) => [m[1], m[2]]));
+  let dateMismatch = 0;
+  for (const p of pages.filter((x) => x.file.startsWith('ai-tools/'))) {
+    const canon = meta(p.html, 'canonical');
+    const updated = (p.html.match(/<meta name="page-updated" content="([^"]*)"/) || [])[1] || '';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(updated) || smDate.get(canon) !== updated) dateMismatch++;
+  }
+  note(dateMismatch === 0, 'page-updated matches the sitemap lastmod', dateMismatch ? `${dateMismatch} pages differ` : 'all directory pages');
+
+  let headSm = '';
+  try { headSm = execSync('git show HEAD:sitemap.xml', { encoding: 'utf8' }); } catch { headSm = ''; }
+  const headDate = new Map([...headSm.matchAll(/<loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod>/g)].map((m) => [m[1], m[2]]));
+  const ownFiles = [['https://raunakpatil.com/', 'index.html'], ['https://raunakpatil.com/radar', 'radar.html'], ['https://raunakpatil.com/ronie', 'ronie.html']];
+  let ownBad = 0;
+  for (const [url, file] of ownFiles) {
+    let changed = true;
+    try { execSync(`git diff --quiet HEAD -- ${file}`, { stdio: 'ignore' }); changed = false; } catch { changed = true; }
+    const cur = smDate.get(url) || '';
+    const prev = headDate.get(url) || '';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(cur)) ownBad++;
+    else if (!changed && prev && cur !== prev) ownBad++;
+  }
+  note(ownBad === 0, 'rebuilding the directory does not restamp /, /radar or /ronie', ownBad ? `${ownBad} own URLs moved` : 'kept');
+
+  const generated = [...pages.filter((p) => p.file.startsWith('ai-tools/')).map((p) => p.html), sitemap, read('ai-tools/radar.json')].join('\n');
+  const hedra = /\bhedra\b/i.test(generated) || /hedra\.com/i.test(generated) || generated.includes('/tool/hedra');
+  note(!hedra, 'Hedra stays out of the public directory, sitemap and radar.json', hedra ? 'found a name, slug or hedra.com link' : 'absent');
 }
 
 console.log(`\n${pass.length} passed, ${fail.length} failed${live ? ' (live sample)' : ' (build output)'}`);
