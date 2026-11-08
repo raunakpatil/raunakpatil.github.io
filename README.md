@@ -94,7 +94,12 @@ AI news, trending open models and a directory of AI tools. `radar.html` sends vi
   data, so Radar's lists can be found on Google. A hub, a "Best AI … tools" page per category, the Top 50, new, free
   and open-source tools, "… alternatives" for each of the Top 50, and a page per tool (every hand-picked one and the
   catalogue's best-known: 20k+ GitHub stars, 500+ Hugging Face likes or Product Hunt upvotes), with structured data,
-  breadcrumbs and links between them. Each tool page offers its makers the **Listed on Radar** badge
+  breadcrumbs and links between them. Each category page states how that list actually breaks down (open source, free,
+  free plan, paid, price on the maker's site) and, when the catalogue has them, the releases dated in the last 90 days.
+  It also links every tool in the category that has its own page. The Top 50, new, free and open-source lists are linked
+  from the category, tool and alternatives pages, not only from the hub. A page's sitemap date changes when its words
+  change, not on every rebuild; `/`, `/radar` and `/ronie` keep theirs unless those files changed. `node scripts/audit-seo.mjs`
+  checks the built pages. Each tool page offers its makers the **Listed on Radar** badge
   (`img/badges/listed-on-radar.svg`), linking back to it. A tool's plain-words line comes from the worker's
   `/explained` (only what's already written), kept in `data/explained.json`. The same lists go out as open data,
   `/ai-tools/radar.json`, which the [best-ai-tools](https://github.com/raunakpatil/best-ai-tools)
