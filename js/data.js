@@ -128,6 +128,14 @@ window.PORTFOLIO = {
       demo: 'https://youtu.be/EHEmLr-u0OI', demoText: 'Watch the launch film ↗',
     },
     {
+      title: 'Ronie Pocket: Offline AI on Your Phone', aka: ['Ronie Pocket'], category: 'App', year: 2026, image: 'img/projects/ronie-pocket.webp', imageMobile: 'img/projects/ronie-pocket-mobile.webp', tunnelImage: 'img/tunnel/ronie-pocket.webp', tunnelImageMobile: 'img/tunnel/ronie-pocket-mobile.webp',
+      colors: ['#8b5cff', '#ff2bd6'],
+      tags: ['Kotlin', 'Jetpack Compose', 'llama.cpp', 'Gemma 4', 'Vulkan', 'Stable Diffusion'],
+      description: 'An AI assistant and image generator that runs entirely on your phone: Gemma 4 on the phone\'s own GPU through llama.cpp and Vulkan, ready in about 5 seconds, with on-device drawing, voice, encrypted memory, reminders and tools, and optional private web search. No account, no cloud, no tracking, and it works in flight mode.',
+      link: 'https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai',
+      demo: 'https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest', demoText: 'Download the APK ↗',
+    },
+    {
       title: 'Radar: Best AI Tools', aka: ['Radar', 'Best AI Tools on the Radar'], category: 'Website', year: 2026, image: 'img/projects/radar.webp', imageMobile: 'img/projects/radar-mobile.webp', tunnelImage: 'img/tunnel/radar.webp', tunnelImageMobile: 'img/tunnel/radar-mobile.webp',
       colors: ['#ff7a1a', '#7cc4ff'],
       tags: ['JavaScript', 'Cloudflare Workers', 'Workers AI', 'GitHub Actions', 'SEO', 'Open data'],
