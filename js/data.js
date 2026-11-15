@@ -132,7 +132,7 @@ window.PORTFOLIO = {
       colors: ['#8b5cff', '#ff2bd6'],
       tags: ['Kotlin', 'Jetpack Compose', 'llama.cpp', 'Gemma 4', 'Vulkan', 'Stable Diffusion'],
       description: 'An AI assistant and image generator that runs entirely on your phone: Gemma 4 on the phone\'s own GPU through llama.cpp and Vulkan, ready in about 5 seconds, with on-device drawing, voice, encrypted memory, reminders and tools, and optional private web search. No account, no cloud, no tracking, and it works in flight mode.',
-      link: 'https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai',
+      link: '/ronie-pocket/', linkText: 'About Ronie Pocket →',
       demo: 'https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest', demoText: 'Download the APK ↗',
     },
     {

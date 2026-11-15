@@ -18,7 +18,7 @@ if (D.status) add(`Current status (the newest information — wherever anything 
 add(`Summary: ${clean(D.bio)}`);
 add(`Email: ${A.email}`);
 add(`Links: ${D.links.map((l) => `${l.label}: ${l.href.replace('mailto:', '')}`).join(' | ')}`);
-add('Pages on this website: Dashboard, Projects, Library (case studies and certificates), and Radar (raunakpatil.com/radar) — the latest AI news headlines, open models trending on Hugging Face, and a directory of 6,000+ AI tools (a few hundred hand-picked by Raunak, the rest gathered every week from GitHub, Hugging Face and Product Hunt). More about it under Radar below.');
+add('Pages on this website: Dashboard, Projects, Library (case studies and certificates), Ronie Pocket (raunakpatil.com/ronie-pocket, the offline Android assistant and on-device image generator: no account, chat and pictures stay on the phone), and Radar (raunakpatil.com/radar) — the latest AI news headlines, open models trending on Hugging Face, and a directory of 6,000+ AI tools (a few hundred hand-picked by Raunak, the rest gathered every week from GitHub, Hugging Face and Product Hunt). More about it under Radar below.');
 add(`Time spent in AI/ML: ${D.time.hours}+ hours since ${D.time.start.year} (started in ${D.time.start.city}).`);
 add();
 add('Experience and education (oldest first):');
@@ -28,7 +28,11 @@ add('Skills (with tools):');
 for (const s of D.skills.items) add(`- ${s.name}: ${s.tools.join(', ')}`);
 add();
 add('Projects:');
-for (const p of D.projects) add(`- ${p.title} (${p.year}, ${p.category}): ${clean(p.description)} Tech: ${p.tags.join(', ')}.${p.link && p.link !== '#' ? ` Link: ${p.link}` : ''}${p.demo && /^https?:/.test(p.demo) ? ` ${(p.demoText || 'Live demo').replace(/\s*[↗→]\s*$/, '')}: ${p.demo}` : ''}`);
+const abs = (u) => !u || u === '#' ? '' : (u.startsWith('/') ? `https://raunakpatil.com${u}` : u);
+for (const p of D.projects) {
+  const link = abs(p.link), demo = abs(p.demo);
+  add(`- ${p.title} (${p.year}, ${p.category}): ${clean(p.description)} Tech: ${p.tags.join(', ')}.${link ? ` Link: ${link}` : ''}${demo && /^https?:/.test(demo) ? ` ${(p.demoText || 'Live demo').replace(/\s*[↗→]\s*$/, '')}: ${demo}` : ''}`);
+}
 add();
 add('Case studies from his work:');
 for (const c of D.caseStudies) add(`- ${c.title} (${c.year}): ${clean(c.description)}`);

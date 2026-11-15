@@ -211,17 +211,21 @@
     $('#detail-tags').innerHTML = (item.tags || []).map((t) => `<span>${esc(t)}</span>`).join('');
     const link = $('#detail-link');
     const has = item.link && item.link !== '#';
+    const onSite = (href) => href.startsWith('#') || (href.startsWith('/') && !href.startsWith('//'));
     link.hidden = !has;
-    if (has) link.href = item.link;
-    link.textContent = item.linkText || 'Visit project ↗';
+    if (has) {
+      link.href = item.link;
+      link.textContent = item.linkText || 'Visit project ↗';
+      if (onSite(item.link)) { link.removeAttribute('target'); link.removeAttribute('rel'); }
+      else { link.target = '_blank'; link.rel = 'noopener'; }
+    }
     // a second button for a live demo (demo / demoText in data.js): a page on this site opens here, anything else in a tab
     const demo = $('#detail-demo');
     demo.hidden = !item.demo;
     if (item.demo) {
-      const inside = item.demo.startsWith('#');
       demo.href = item.demo;
       demo.textContent = item.demoText || 'Try it ↗';
-      if (inside) { demo.removeAttribute('target'); demo.removeAttribute('rel'); } else { demo.target = '_blank'; demo.rel = 'noopener'; }
+      if (onSite(item.demo)) { demo.removeAttribute('target'); demo.removeAttribute('rel'); } else { demo.target = '_blank'; demo.rel = 'noopener'; }
     }
     modal.classList.remove('closing');
     modal.classList.toggle('fly', fly);

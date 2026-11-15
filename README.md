@@ -100,7 +100,7 @@ AI news, trending open models and a directory of AI tools. `radar.html` sends vi
   `/ai-tools/radar.json`, which the [best-ai-tools](https://github.com/raunakpatil/best-ai-tools)
   repo builds its README from. `deploy-prep` and the Refresh Radar Action rebuild them all, and the Action then tells
   IndexNow (Bing and others) which pages changed (`scripts/indexnow.mjs`, key file `/<key>.txt`).
-- `robots.txt` points search engines at `sitemap.xml`, which lists `/`, `/radar`, `/ronie` and every `/ai-tools` page.
+- `robots.txt` points search engines at `sitemap.xml`, which lists `/`, `/radar`, `/ronie`, `/ronie-pocket/` and every `/ai-tools` page. `robots.txt` allows the whole site (`Allow: /`).
   The share images (what a link shows on LinkedIn, X, WhatsApp) are `img/og.png` for the site (brought down to 256 colours to stay well under WhatsApp's ~300 KB for its big card) and `img/radar-og.png`
   for Radar (`scripts/og/home-og.html` and `radar-og.html`, rendered by `scripts/build-og.mjs`).
 
