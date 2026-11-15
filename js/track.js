@@ -32,6 +32,7 @@
   function route() {
     var h = location.hash.replace(/^#/, '').split(/[?&]/)[0];
     var p = location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    if (p === '/ronie-pocket') return 'ronie-pocket';
     if (/^\/(ronie)$/.test(p) || h === 'assistant') return 'ronie';
     if (/^\/(radar|tools)$/.test(p)) return 'radar';
     if (p.indexOf('/ai-tools') === 0) return p.slice(1).slice(0, 40);

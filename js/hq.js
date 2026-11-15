@@ -41,7 +41,7 @@ const place = (city, cc) => [city, cc ? country(cc) : ''].filter(Boolean).join('
 const hue = (s) => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 100; return h; };
 const initials = (n) => String(n || '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || '?';
 const avatar = (p) => (p.name ? `<span class="avatar" style="--p:${hue(p.name)}%">${esc(initials(p.name))}</span>` : '<span class="avatar anon">?</span>');
-const ROUTES = { dashboard: 'Dashboard', projects: 'Projects', library: 'Library', radar: 'Radar', ronie: 'Ronie', assistant: 'Ronie' };
+const ROUTES = { dashboard: 'Dashboard', projects: 'Projects', library: 'Library', radar: 'Radar', ronie: 'Ronie', assistant: 'Ronie', 'ronie-pocket': 'Ronie Pocket' };
 const routeName = (r) => ROUTES[r] || (r && r.startsWith('ai-tools') ? `SEO · ${r.replace(/^ai-tools\/?/, '/') || '/'}` : r || '—');
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u || ''; } };
 const SPECTRUM = ['#ff70f3', '#e07cf8', '#b48cff', '#8fa8ff', '#5fd6e0', '#38ffb3'];

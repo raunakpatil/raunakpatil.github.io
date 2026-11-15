@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ronie Pocket: offline AI assistant for Android</title>
+  <meta name="description" content="Private on-device AI assistant and image generator for Android. No account, no cloud, no tracking. Chat, voice and pictures stay on your phone.">
+  <link rel="canonical" href="https://raunakpatil.com/ronie-pocket/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ronie Pocket · Raunak Patil">
+  <meta property="og:title" content="Ronie Pocket: offline AI assistant for Android">
+  <meta property="og:description" content="Private on-device AI assistant and image generator for Android. No account, no cloud, no tracking. Chat, voice and pictures stay on your phone.">
+  <meta property="og:url" content="https://raunakpatil.com/ronie-pocket/">
+  <meta property="og:image" content="https://raunakpatil.com/ronie-pocket/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Ronie Pocket: a private on-device AI assistant for Android. No account, no cloud, no tracking. It works in flight mode and is free.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ronie Pocket: offline AI assistant for Android">
+  <meta name="twitter:description" content="Private on-device AI assistant and image generator for Android. No account, no cloud, no tracking. Chat, voice and pictures stay on your phone.">
+  <meta name="twitter:image" content="https://raunakpatil.com/ronie-pocket/og.jpg">
+  <meta name="twitter:image:alt" content="Ronie Pocket: a private on-device AI assistant for Android. No account, no cloud, no tracking. It works in flight mode and is free.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico?v=2" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+  <link rel="preload" as="image" href="/ronie-pocket/media/banner.webp" type="image/webp" imagesrcset="/ronie-pocket/media/banner-800.webp 800w, /ronie-pocket/media/banner.webp 1600w" imagesizes="(max-width: 840px) 100vw, 1080px">
+  <link rel="stylesheet" href="/css/style.css?v=20261113083745">
+  <link rel="stylesheet" href="/css/pages.css?v=20261113083745">
+  <style>
+    .pk { max-width: 1080px; margin: 0 auto; padding-bottom: 28px; }
+    .pk-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 10px 0; }
+    .pk-btn { display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 999px; background: #111; color: #fff; font-size: 14px; text-decoration: none; box-shadow: var(--neu-out-sm); }
+    .pk-btn:hover { color: #fff; }
+    .pk-btn:active { box-shadow: var(--neu-in-sm); }
+    .pk-btn-ghost { background: var(--surface); color: #111; }
+    .pk-btn-ghost:hover { color: #111; }
+    .pk-meta, .pk-prose, .pk-foot { max-width: 72ch; margin: 12px 10px 0; font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }
+    .pk-meta { margin-top: 10px; font-size: 13.5px; }
+    .pk-prose strong, .pk-card strong { color: #111; font-weight: 500; }
+    .pk-banner { margin: 18px 0 0; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px rgba(0, 0, 0, .06); }
+    .pk-banner img { width: 100%; height: auto; }
+    .pk-sec { margin-top: 40px; }
+    .pk-sec h2 { margin: 0 10px 12px; font-size: clamp(26px, 3vw, 34px); font-weight: 400; letter-spacing: -.025em; line-height: 1.15; }
+    .pk-prose a, .pk-meta a, .pk-card a, .pk-faq a, .pk-foot a, .pk-split a, .pk-specs a { color: #111; text-decoration: underline; text-decoration-color: #ccc; text-underline-offset: 3px; }
+    .pk-prose a:hover, .pk-meta a:hover, .pk-card a:hover, .pk-faq a:hover, .pk-foot a:hover, .pk-split a:hover, .pk-specs a:hover { text-decoration-color: currentColor; }
+    .pk-shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+    .pk-shots figure { margin: 0; padding: 10px 10px 12px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-shots img { width: 100%; height: auto; border-radius: 12px; background: #000; }
+    .pk-shots figcaption { margin-top: 8px; font-size: 12.5px; line-height: 1.4; color: #6b6b6b; }
+    .pk-cap { margin: 8px 10px 0; font-size: 13px; color: #6b6b6b; }
+    .pk-table { margin-top: 14px; overflow-x: auto; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-table table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14.5px; line-height: 1.4; }
+    .pk-table th, .pk-table td { padding: 11px 14px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+    .pk-table thead th { font-size: 11px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: #6b6b6b; background: #fafafa; }
+    .pk-table tbody th { font-size: 14.5px; font-weight: 500; color: #111; }
+    .pk-table tr:last-child td { border-bottom: 0; }
+    .pk-table td:first-child { color: #111; }
+    .pk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 14px; }
+    .pk-card { padding: 16px 18px 18px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-card h3 { margin-bottom: 6px; font-size: 16px; font-weight: 500; letter-spacing: -.01em; }
+    .pk-card p { font-size: 14.5px; line-height: 1.5; color: #444; }
+    .pk-soon { margin: 14px 10px 0; max-width: 72ch; }
+    .pk-soon li { margin: 6px 0; font-size: 15.5px; line-height: 1.45; color: #333; }
+    .pk-split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 10px; margin-top: 14px; }
+    .pk-split section { padding: 16px 18px 18px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-split h3 { margin-bottom: 8px; font-size: 16px; font-weight: 500; }
+    .pk-list { margin: 0; padding: 0; }
+    .pk-list li { position: relative; margin: 7px 0; padding-left: 14px; font-size: 14.5px; line-height: 1.45; color: #333; }
+    .pk-list li::before { content: ""; position: absolute; left: 0; top: .55em; width: 5px; height: 5px; border-radius: 50%; background: #111; }
+    .pk-mini { min-width: 0; margin-top: 0; overflow-x: auto; background: transparent; box-shadow: none; border-radius: 0; }
+    .pk-mini table { min-width: 420px; font-size: 13.5px; }
+    .pk-specs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 14px; }
+    .pk-specs div { padding: 14px 16px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-specs dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; }
+    .pk-specs dd { margin-top: 4px; font-size: 14.5px; line-height: 1.4; color: #222; }
+    .pk-faq { margin-top: 8px; }
+    .pk-faq details { margin-top: 8px; padding: 14px 18px 16px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
+    .pk-faq summary { cursor: pointer; font-size: 16px; font-weight: 500; letter-spacing: -.01em; }
+    .pk-faq summary:focus-visible { outline-offset: 4px; }
+    .pk-faq p { max-width: 70ch; margin-top: 8px; font-size: 15px; line-height: 1.55; color: #444; }
+    .pk-foot { margin-top: 36px; padding-top: 16px; border-top: 1px solid #e4e4e4; }
+    @media (max-width: 760px) {
+      .pk-shots { display: flex; gap: 10px; margin-right: -10px; padding-bottom: 6px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+      .pk-shots::-webkit-scrollbar { display: none; }
+      .pk-shots figure { flex: 0 0 78%; scroll-snap-align: center; }
+      .pk-split { grid-template-columns: minmax(0, 1fr); }
+      .pk-prose, .pk-meta { font-size: 15px; }
+      .pk-table { overflow-x: visible; }
+      .pk-table table, .pk-mini table { width: 100%; min-width: 0; table-layout: fixed; }
+      .pk-table th, .pk-table td { padding: 8px 8px; overflow-wrap: anywhere; }
+      .pk-table tbody th { font-size: 13px; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Raunak Patil", "item": "https://raunakpatil.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Ronie Pocket", "item": "https://raunakpatil.com/ronie-pocket/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Ronie Pocket",
+        "operatingSystem": "Android",
+        "applicationCategory": "UtilitiesApplication",
+        "description": "Private on-device AI assistant and image generator for Android. No account, no cloud, no tracking. Chat, voice and pictures stay on your phone.",
+        "url": "https://raunakpatil.com/ronie-pocket/",
+        "downloadUrl": "https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest",
+        "installUrl": "https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest",
+        "license": "https://www.apache.org/licenses/LICENSE-2.0",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "image": "https://raunakpatil.com/ronie-pocket/og.jpg",
+        "screenshot": "https://raunakpatil.com/ronie-pocket/media/screen-home-720.webp",
+        "author": { "@type": "Person", "name": "Raunak Patil", "url": "https://raunakpatil.com/" },
+        "sameAs": "https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai",
+        "featureList": [
+          "Offline chat on the phone's GPU",
+          "On-device image generation",
+          "No account, no cloud and no tracking",
+          "On-device voice",
+          "Encrypted memory on the phone",
+          "Tasks, reminders, timers, alarms and calendar",
+          "Optional web search with sources",
+          "Model Context Protocol connectors"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does it really work without internet?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. After the one-time model download, chat, voice, memory, tasks, reminders, timers and alarms all work in flight mode. Only web search and connectors need a connection, and Offline mode switches those off." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need an account or an API key?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. There is nothing to sign up for. Web search uses DuckDuckGo without a key." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is it actually uncensored?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ronie has no topic filters or lectures, and you control his tone with a slider. The only things he will not do are help harm real people, for example weapon or poison instructions, and anything sexual involving minors." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can it really generate images offline, and is that uncensored too?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Drawing uses SD-Turbo through stable-diffusion.cpp on the phone's GPU: about 45 seconds for a 512×512 picture on a Pixel 9 Pro, with nothing sent anywhere. It draws adult and nude content without filters. The only hard block is sexual content involving minors. The drawing model is an optional 1.8 GB download and its licence is for non-commercial use." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which AI model does it use?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Phones with 12 GB of RAM or more get Gemma 4 E2B on the GPU. 8 GB phones get Qwen3.5-2B, and 4 GB phones get Qwen3.5-0.8B. Ronie recommends the right one on first launch." }
+          },
+          {
+            "@type": "Question",
+            "name": "How fast is it?",
+            "acceptedAnswer": { "@type": "Answer", "text": "On a Pixel 9 Pro: ready in about 5 seconds, the first word in under a second, about 10 tokens per second. That is a comfortable reading speed. Older phones use a lighter model to stay quick." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is this different from other local-LLM apps?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Most local-LLM apps are model runners: you pick a GGUF file and get a chat box. Ronie Pocket is an assistant. He has a personality and a voice, remembers you, uses tools (reminders, timers, calendar, web search, MCP), and works out of the box with a curated model. There is nothing to configure." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my data used to train anything?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Nothing is collected, so there is nothing to train on." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="pg-page">
+  <header class="topbar">
+    <a class="brand" href="/"><span class="brand-full">Raunak Patil</span><span class="brand-short">RP</span></a>
+    <nav class="tabs" aria-label="Main">
+      <span class="tabs-indicator" aria-hidden="true"></span>
+      <a href="/#dashboard">Dashboard</a>
+      <a href="/#projects">Projects</a>
+      <a href="/#library">Library</a>
+      <a href="/radar">Radar</a>
+    </nav>
+    <div class="social" id="social">
+      <nav class="social-links" id="social-links" aria-label="Elsewhere" inert><a href="/#profile" style="--i:5" data-label="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.6-3.7 3.7-6.2 7.5-6.2s6.9 2.5 7.5 6.2"/></svg></a><a href="mailto:raunakpatil15@gmail.com" style="--i:4" data-label="Email" aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></a><a href="https://www.linkedin.com/in/raunakpatil/" style="--i:3" data-label="LinkedIn" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a><a href="https://github.com/raunakpatil" style="--i:2" data-label="GitHub" aria-label="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></a><a href="https://www.youtube.com/@eldritchlore" style="--i:1" data-label="YouTube" aria-label="YouTube" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 17a24 24 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.6 49.6 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24 24 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.6 49.6 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg></a><a href="https://www.instagram.com/raunakpatil/" style="--i:0" data-label="Instagram" aria-label="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a></nav>
+      <button class="social-btn" type="button" aria-expanded="false" aria-controls="social-links" aria-label="Show links"><span class="social-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+    </div>
+  </header>
+  <main>
+    <article class="tl pg-body pk">
+      <nav class="pg-crumbs" aria-label="Breadcrumb"><a href="/">Raunak Patil</a><i>/</i><span>Ronie Pocket</span></nav>
+      <header class="pk-intro">
+        <div class="pg-head">
+          <h1 class="page-title">Ronie Pocket <em>offline AI assistant for Android</em></h1>
+        </div>
+        <p class="pg-sub">A private AI assistant and on-device image generator. No account, no cloud, no tracking. Chat, voice, memory and pictures stay on the phone, including in flight mode.</p>
+        <div class="pk-actions">
+          <a class="pk-btn" href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest">Download for Android</a>
+          <a class="pk-btn pk-btn-ghost" href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai">Source on GitHub</a>
+        </div>
+        <p class="pk-meta">Free, under Apache-2.0. This is the Android app. <a href="/ronie">Ronie on this website</a> is a separate 3D assistant in the browser.</p>
+        <figure class="pk-banner">
+          <img src="/ronie-pocket/media/banner.webp" srcset="/ronie-pocket/media/banner-800.webp 800w, /ronie-pocket/media/banner.webp 1600w" sizes="(max-width: 840px) 100vw, 1080px" width="1600" height="600" alt="Ronie Pocket banner with the app logo and the line: uncensored AI assistant and image generator" fetchpriority="high" decoding="async">
+        </figure>
+      </header>
+
+      <section class="pk-sec" id="drawing" aria-labelledby="drawing-title">
+        <h2 id="drawing-title">On-device chat and image generation</h2>
+        <p class="pk-prose">Ask him to draw a cat astronaut in watercolour. About 45 seconds later the picture is in the chat, made by the phone's GPU. No server, no account, no credits, and the prompt is not logged anywhere. It works in flight mode.</p>
+        <div class="pk-shots">
+          <figure>
+            <img src="/ronie-pocket/media/screen-drawing-720.webp" srcset="/ronie-pocket/media/screen-drawing-360.webp 360w, /ronie-pocket/media/screen-drawing-720.webp 720w" sizes="(max-width: 760px) 78vw, 320px" width="720" height="1491" alt="Ronie Pocket chat on a phone: the request Draw a cat astronaut in watercolour, and the finished picture with Save, Share, Again and Edit" loading="lazy" decoding="async">
+            <figcaption>A picture drawn in the chat, with Save, Share, Again and Edit.</figcaption>
+          </figure>
+          <figure>
+            <img src="/ronie-pocket/media/screen-home-720.webp" srcset="/ronie-pocket/media/screen-home-360.webp 360w, /ronie-pocket/media/screen-home-720.webp 720w" sizes="(max-width: 760px) 78vw, 320px" width="720" height="1491" alt="Ronie Pocket home screen on a phone, with example prompts including a drawing prompt" loading="lazy" decoding="async">
+            <figcaption>The home screen, with example prompts.</figcaption>
+          </figure>
+          <figure>
+            <img src="/ronie-pocket/media/screen-models-720.webp" srcset="/ronie-pocket/media/screen-models-360.webp 360w, /ronie-pocket/media/screen-models-720.webp 720w" sizes="(max-width: 760px) 78vw, 320px" width="720" height="1491" alt="Ronie Pocket Settings on a phone: the SD-Turbo drawing model marked in use, with delete, and a 1024 pixel model marked not downloadable yet" loading="lazy" decoding="async">
+            <figcaption>Settings, Models: the drawing model in use.</figcaption>
+          </figure>
+        </div>
+        <p class="pk-cap">Screenshots from a Pixel 9 Pro.</p>
+        <p class="pk-prose">Drawing is unfiltered. You ask in chat ("draw", "paint", "make a picture of"), watch it take shape, then save it, share it, draw it again, or edit it. There is no daily quota, no watermark and no subscription. You can switch or delete drawing models in Settings, Models. The one thing he will not draw is anything sexual involving minors.</p>
+      </section>
+
+      <section class="pk-sec" id="why" aria-labelledby="why-title">
+        <h2 id="why-title">Why Ronie Pocket</h2>
+        <p class="pk-prose">Most AI assistants send every word you type to a server, ask you to sign up, and refuse half of what you ask. Ronie Pocket does none of that.</p>
+        <div class="pk-table">
+          <table>
+            <caption class="sr-only">How Ronie Pocket compares with typical cloud AI apps</caption>
+            <thead>
+              <tr>
+                <th scope="col"> </th>
+                <th scope="col">Cloud AI apps</th>
+                <th scope="col">Ronie Pocket</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Needs an account</th><td>Yes</td><td>Never</td></tr>
+              <tr><th scope="row">Your chats go to a company's servers</th><td>Yes</td><td>Never: everything runs on your phone</td></tr>
+              <tr><th scope="row">Works with no internet, including flight mode</th><td>No</td><td>Yes</td></tr>
+              <tr><th scope="row">Topic filters and lectures</th><td>Often</td><td>No: unfiltered</td></tr>
+              <tr><th scope="row">Image generation</th><td>On their servers, filtered, with quotas</td><td>On your phone, unfiltered, no quota</td></tr>
+              <tr><th scope="row">Analytics and tracking</th><td>Usually</td><td>None</td></tr>
+              <tr><th scope="row">Remembers you</th><td>On their servers</td><td>Encrypted, on your phone only</td></tr>
+              <tr><th scope="row">Monthly fee for the good model</th><td>Often</td><td>Free</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="pk-sec" id="features" aria-labelledby="features-title">
+        <h2 id="features-title">What it can do</h2>
+        <div class="pk-grid">
+          <article class="pk-card"><h3>A model on the phone</h3><p>Gemma 4 runs on the phone's GPU. He is ready about 5 seconds after you open the app, and the first word of a reply comes in under a second.</p></article>
+          <article class="pk-card"><h3>Pictures on the phone</h3><p>Ask in the chat and an image is generated on the GPU in about 45 seconds. The drawing model is SD-Turbo, an optional 1.8 GB download.</p></article>
+          <article class="pk-card"><h3>Unfiltered, with two limits</h3><p>No topic filters and no lectures. A slider runs from clean to sweary. He will not help harm real people, and he refuses anything sexual involving minors.</p></article>
+          <article class="pk-card"><h3>Photos</h3><p>Share a photo, receipt or screenshot and ask about it. A receipt becomes an expense card. This needs the full model.</p></article>
+          <article class="pk-card"><h3>Voice</h3><p>Push-to-talk input, and replies spoken aloud by an on-device text-to-speech model. Ask by voice and he answers by voice.</p></article>
+          <article class="pk-card"><h3>Memory, on the phone</h3><p>Tell him your sister is vegetarian, and later dinner ideas can take that into account. Memory is encrypted on the phone. You can see and delete everything he knows.</p></article>
+          <article class="pk-card"><h3>Tasks, reminders, calendar</h3><p>Tasks, reminders, timers with a live countdown, alarms and your calendar. Every action shows a card with Undo, and anything risky asks first.</p></article>
+          <article class="pk-card"><h3>Web search, when you want it</h3><p>No API key and no account. He searches, reads the pages and answers with numbered sources. Your name, emails, phone numbers and addresses are removed from the query before it leaves the phone.</p></article>
+          <article class="pk-card"><h3>Connectors</h3><p>Add any remote Model Context Protocol server: notes, to-do apps, home automation. Each one is labelled with exactly where its data goes.</p></article>
+          <article class="pk-card"><h3>From any app</h3><p>Share text or a link into Ronie to summarise it, explain it, turn it into a task, or remember it.</p></article>
+          <article class="pk-card"><h3>X-ray mode</h3><p>In Labs, a live readout of what is happening inside the model while it writes.</p></article>
+          <article class="pk-card"><h3>The right model for the phone</h3><p>Three curated models, chosen on first launch. 12 GB or more gets Gemma 4 E2B on the GPU. 8 GB gets Qwen3.5-2B. 4 GB gets Qwen3.5-0.8B.</p></article>
+        </div>
+      </section>
+
+      <section class="pk-sec" id="next" aria-labelledby="next-title">
+        <h2 id="next-title">Coming next</h2>
+        <ul class="pk-list pk-soon">
+          <li>Sharper, bigger pictures: 1024 px drawing models.</li>
+          <li>An email watcher and a daily brief, with a morning summary in his voice.</li>
+          <li>Offline Wikipedia, for grounded answers with no network.</li>
+        </ul>
+        <p class="pk-prose">New features land in the <a href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai">source repository</a> first. More platforms are planned.</p>
+      </section>
+
+      <section class="pk-sec" id="privacy" aria-labelledby="privacy-title">
+        <h2 id="privacy-title">Privacy</h2>
+        <p class="pk-prose">There is no account, no analytics SDK, no telemetry and no server of ours to send anything to. One Offline mode switch blocks every outgoing request. Each request is listed in the in-app activity log.</p>
+        <div class="pk-split">
+          <section aria-labelledby="stays">
+            <h3 id="stays">Never leaves your phone</h3>
+            <ul class="pk-list">
+              <li>Your conversations</li>
+              <li>Your voice</li>
+              <li>What Ronie remembers about you</li>
+              <li>Your tasks, reminders and calendar</li>
+              <li>Your prompts and pictures</li>
+            </ul>
+          </section>
+          <section aria-labelledby="leaves">
+            <h3 id="leaves">Uses the internet only when you choose</h3>
+            <div class="pk-table pk-mini">
+              <table>
+                <caption class="sr-only">When Ronie Pocket uses the internet, where it goes, and what is sent</caption>
+                <thead>
+                  <tr><th scope="col">When</th><th scope="col">Goes to</th><th scope="col">What is sent</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">First setup</th><td>Hugging Face</td><td>The AI model, downloaded once</td></tr>
+                  <tr><th scope="row">Web search</th><td>DuckDuckGo and the pages it reads</td><td>The search query, with your name, emails, phone numbers and addresses removed</td></tr>
+                  <tr><th scope="row">A connector you added</th><td>The server you added</td><td>Only what that tool needs, labelled with the host</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="pk-sec" id="get" aria-labelledby="get-title">
+        <h2 id="get-title">Get it</h2>
+        <p class="pk-prose">Download the latest APK and open it on the phone. On first launch he picks a model for that phone and downloads it once. The published release is for Android 10 or newer, arm64.</p>
+        <dl class="pk-specs">
+          <div><dt>Download</dt><dd><a href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest">Latest GitHub release</a></dd></div>
+          <div><dt>Memory</dt><dd>4 GB minimum, 8 GB or more recommended, 12 GB or more with a modern GPU for the full Gemma 4 model</dd></div>
+          <div><dt>Storage</dt><dd>0.5–4 GB for the model, plus 1.8 GB if you add drawing</dd></div>
+          <div><dt>Tested on</dt><dd>Pixel 9 Pro: about 10 tokens a second, first word in about 0.7 seconds, ready in about 5 seconds</dd></div>
+        </dl>
+        <p class="pk-actions"><a class="pk-btn" href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest">Download for Android</a></p>
+      </section>
+
+      <section class="pk-sec" id="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">FAQ</h2>
+        <div class="pk-faq">
+          <details>
+            <summary>Does it really work without internet?</summary>
+            <p>Yes. After the one-time model download, chat, voice, memory, tasks, reminders, timers and alarms all work in flight mode. Only web search and connectors need a connection, and Offline mode switches those off.</p>
+          </details>
+          <details>
+            <summary>Do I need an account or an API key?</summary>
+            <p>No. There is nothing to sign up for. Web search uses DuckDuckGo without a key.</p>
+          </details>
+          <details>
+            <summary>Is it actually uncensored?</summary>
+            <p>Ronie has no topic filters or lectures, and you control his tone with a slider. The only things he will not do are help harm real people, for example weapon or poison instructions, and anything sexual involving minors.</p>
+          </details>
+          <details>
+            <summary>Can it really generate images offline, and is that uncensored too?</summary>
+            <p>Yes. Drawing uses SD-Turbo through stable-diffusion.cpp on the phone's GPU: about 45 seconds for a 512×512 picture on a Pixel 9 Pro, with nothing sent anywhere. It draws adult and nude content without filters. The only hard block is sexual content involving minors. The drawing model is an optional 1.8 GB download and its licence is for non-commercial use.</p>
+          </details>
+          <details>
+            <summary>Which AI model does it use?</summary>
+            <p>Phones with 12 GB of RAM or more get Gemma 4 E2B on the GPU. 8 GB phones get Qwen3.5-2B, and 4 GB phones get Qwen3.5-0.8B. Ronie recommends the right one on first launch.</p>
+          </details>
+          <details>
+            <summary>How fast is it?</summary>
+            <p>On a Pixel 9 Pro: ready in about 5 seconds, the first word in under a second, about 10 tokens per second. That is a comfortable reading speed. Older phones use a lighter model to stay quick.</p>
+          </details>
+          <details>
+            <summary>How is this different from other local-LLM apps?</summary>
+            <p>Most local-LLM apps are model runners: you pick a GGUF file and get a chat box. Ronie Pocket is an assistant. He has a personality and a voice, remembers you, uses tools (reminders, timers, calendar, web search, MCP), and works out of the box with a curated model. There is nothing to configure.</p>
+          </details>
+          <details>
+            <summary>Is my data used to train anything?</summary>
+            <p>No. Nothing is collected, so there is nothing to train on.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="pk-sec" id="license" aria-labelledby="license-title">
+        <h2 id="license-title">License</h2>
+        <p class="pk-prose"><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>: free to use, modify and ship, including commercially. Bundled third-party models and data keep their own licences. The drawing model's licence is for non-commercial use. Built on llama.cpp, Gemma 4, Qwen3.5, ONNX Runtime, SQLCipher and others. Credits are in the <a href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai">repository</a>.</p>
+        <p class="pk-prose">The app is Kotlin and Jetpack Compose, on a llama.cpp engine with a Vulkan GPU backend. Build instructions are in the repository.</p>
+      </section>
+
+      <p class="pk-foot"><a href="/">Raunak Patil</a> · <a href="/ronie">Ronie</a> · <a href="/#projects">Projects</a> · <a href="https://github.com/raunakpatil/ronie-pocket-offline-mobile-ai/releases/latest">Download</a></p>
+    </article>
+  </main>
+  <script>
+    (function () {
+      var a = document.querySelector('.tabs a.active'), i = document.querySelector('.tabs-indicator');
+      if (a && i) {
+        function place() { i.style.width = a.offsetWidth + 'px'; i.style.transform = 'translateX(' + a.offsetLeft + 'px)'; }
+        i.style.transition = 'none'; place(); addEventListener('resize', place);
+        if (document.fonts) document.fonts.ready.then(place);
+      }
+      var so = document.getElementById('social'), sb = so.querySelector('.social-btn'), sl = document.getElementById('social-links');
+      function setOpen(o) { so.classList.toggle('open', o); so.closest('.topbar').classList.toggle('links-open', o); sb.setAttribute('aria-expanded', String(o)); sb.setAttribute('aria-label', o ? 'Hide links' : 'Show links'); sl.inert = !o; }
+      sb.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!so.classList.contains('open')); });
+      document.addEventListener('click', function (e) { if (so.classList.contains('open') && !so.contains(e.target)) setOpen(false); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+    })();
+  </script>
+  <script src="/js/track.js?v=20261113083745" defer></script>
+</body>
+</html>

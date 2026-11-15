@@ -3,11 +3,14 @@
 // (scripts/build-seo-pages.mjs).   node scripts/deploy-prep.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const file = new URL('../index.html', import.meta.url);
 const v = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
-const html = readFileSync(file, 'utf8');
-const n = (html.match(/\?v=\d{14}/g) || []).length;
-writeFileSync(file, html.replace(/\?v=\d{14}/g, `?v=${v}`));
-console.log(`index.html: ?v=${v} (${n} files)`);
+for (const name of ['index.html', 'ronie-pocket/index.html']) {
+  const file = new URL(`../${name}`, import.meta.url);
+  const html = readFileSync(file, 'utf8');
+  const n = (html.match(/\?v=\d{14}/g) || []).length;
+  if (!n) continue;
+  writeFileSync(file, html.replace(/\?v=\d{14}/g, `?v=${v}`));
+  console.log(`${name}: ?v=${v} (${n} files)`);
+}
 await import('./build-radar-page.mjs');
 await import('./build-seo-pages.mjs');

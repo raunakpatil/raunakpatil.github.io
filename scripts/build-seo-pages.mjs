@@ -615,7 +615,8 @@ writeFileSync(at('ai-tools/radar.json'), `${JSON.stringify({
 // the sitemap: the site's own pages, then all of these. One file: 6,000 tools do not each have a page
 // (only the hand-picked ones and the catalogue names people search for), so this stays far under
 // the 50,000 URL and 50MB limits and does not need a sitemap index.
-const own = [['/', 1.0, 'weekly'], ['/radar', 0.9, 'daily'], ['/ronie', 0.6, 'monthly']];
+const own = [['/', 1.0, 'weekly'], ['/radar', 0.9, 'daily'], ['/ronie', 0.6, 'monthly'], ['/ronie-pocket/', 0.7, 'monthly']];
+if (!existsSync(at('ronie-pocket/index.html'))) throw new Error('sitemap lists /ronie-pocket/ but ronie-pocket/index.html is missing');
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${own.map(([u, p, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${TODAY}</lastmod><changefreq>${f}</changefreq><priority>${p.toFixed(1)}</priority></url>`).join('\n')}
